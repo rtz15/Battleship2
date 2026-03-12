@@ -32,6 +32,8 @@
 		<allure.version>2.31.0</allure.version>
 
 		<jetbrains.annotations.version>26.1.0</jetbrains.annotations.version>
+
+		<openpdf.version>3.0.3</openpdf.version>
 	</properties>
 
 	<dependencies>
@@ -83,6 +85,12 @@
 			<artifactId>annotations</artifactId>
 			<version>${jetbrains.annotations.version}</version>
 			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.github.librepdf</groupId>
+			<artifactId>openpdf</artifactId>
+			<version>${openpdf.version}</version>
 		</dependency>
 	</dependencies>
 
