@@ -1,7 +1,7 @@
 # ⚓ Battleship 2.0
 
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
-![Java Version](https://img.shields.io/badge/Java-17%2B-blue)
+![Java Version](https://img.shields.io/badge/Java-21%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 > A modern take on the classic naval warfare game, designed for the XVII century setting with updated software engineering patterns.
@@ -42,7 +42,7 @@ Hits are calculated based on the intersection of the shot vector and the ship's 
 ---
 
 ## 🛠 Technical Stack
-* **Language:** Java 17
+* **Language:** Java 21
 * **Build Tool:** Maven / Gradle
 * **Testing:** JUnit 5
 * **Logging:** Log4j2
@@ -52,7 +52,7 @@ Hits are calculated based on the intersection of the shot vector and the ship's 
 ## 🚀 Installation & Setup
 
 ### Prerequisites
-* JDK 17 or higher
+* JDK 21 or higher
 * Git
 
 ### Step-by-Step
@@ -129,6 +129,23 @@ mvn test
 
 > [!TIP]
 > Use the `-Dtest=ClassName` flag to run specific test suites during development.
+
+## PDF Export
+
+The simulator now exports a PDF summary to `./output/summary.pdf` when a game reaches `game over`.
+
+Quick local checks:
+```bash
+mvn test
+mvn -Dtest=PdfExporterTest test
+mvn package
+```
+
+To generate the real PDF from the simulator:
+1. Run `battleship.Main` in IntelliJ.
+2. Use `gerafrota`.
+3. Use `simula` and wait until all ships sink.
+4. Confirm `output/summary.pdf` was created.
 
 ---
 
