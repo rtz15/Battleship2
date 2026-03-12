@@ -1,7 +1,7 @@
 # ⚓ Battleship 2.0
 
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
-![Java Version](https://img.shields.io/badge/Java-17%2B-blue)
+![Java Version](https://img.shields.io/badge/Java-21%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 > A modern take on the classic naval warfare game, designed for the XVII century setting with updated software engineering patterns.
@@ -42,7 +42,7 @@ Hits are calculated based on the intersection of the shot vector and the ship's 
 ---
 
 ## 🛠 Technical Stack
-* **Language:** Java 17
+* **Language:** Java 21
 * **Build Tool:** Maven / Gradle
 * **Testing:** JUnit 5
 * **Logging:** Log4j2
@@ -52,13 +52,13 @@ Hits are calculated based on the intersection of the shot vector and the ship's 
 ## 🚀 Installation & Setup
 
 ### Prerequisites
-* JDK 17 or higher
+* JDK 21 or higher
 * Git
 
 ### Step-by-Step
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/britoeabreu/Battleship2.git](https://github.com/britoeabreu/Battleship2.git)
+   git clone [https://github.com/rtz15/Battleship2.git](https://github.com/rtz15/Battleship2.git)
    ```
 2. **Navigate to directory:**
    ```bash
@@ -75,7 +75,7 @@ Hits are calculated based on the intersection of the shot vector and the ship's 
 
 You can access the generated Javadoc here:
 
-👉 [Battleship2 API Documentation](https://britoeabreu.github.io/Battleship2/)
+👉 [Battleship2 API Documentation](https://rtz15.github.io/Battleship2/)
 
 
 ### Core Logic
@@ -147,5 +147,5 @@ Contributions are what make the open-source community such an amazing place to l
 Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
-**Maintained by:** [@britoeabreu](https://github.com/britoeabreu)  
+**Maintained by:** [@rtz15](https://github.com/rtz15)  
 *Created for the Software Engineering students at ISCTE-IUL.*

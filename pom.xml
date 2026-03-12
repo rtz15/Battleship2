@@ -10,7 +10,7 @@
 
 	<name>BattleshipGame</name>
 	<description>A Battleship Game player.</description>
-	<url>https://github.com/britoeabreu/Battleship2.git</url>
+	<url>https://github.com/rtz15/Battleship2.git</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -112,7 +112,7 @@
 							<createDependencyReducedPom>false</createDependencyReducedPom>
 							<transformers>
 								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>pt.iscte-iul.istar.battleship.Main</mainClass>
+									<mainClass>battleship.Main</mainClass>
 								</transformer>
 							</transformers>
 						</configuration>
