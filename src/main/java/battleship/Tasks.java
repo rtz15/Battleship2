@@ -1,5 +1,6 @@
 package battleship;
 
+import java.util.List;
 import java.util.Scanner;
 
 import org.apache.logging.log4j.LogManager;
@@ -32,6 +33,7 @@ public class Tasks {
 	private static final String MAPA = "mapa";
 	private static final String STATUS = "estado";
 	private static final String SIMULA = "simula";
+	private static final String HISTORICO = "historico";
 
 	/**
 	 * This task also tests the fighting element of a round of three shots
@@ -101,6 +103,15 @@ public class Tasks {
 					if (game != null)
 						game.printMyBoard(true, true);
 					break;
+				case HISTORICO:
+					GameHistory gameHistory = new GameHistory();
+					List<String> history = gameHistory.getHistory();
+					System.out.println("======================= HISTÓRICO DE JOGOS =======================");
+					for (String entry : history) {
+						System.out.println(entry);
+					}
+					System.out.println("===============================================================");
+					break;
                 case AJUDA:
                     menuHelp();
                     break;
@@ -126,6 +137,7 @@ public class Tasks {
 		System.out.println("- " + RAJADA + ": Realiza uma rajada de disparos.");
 		System.out.println("- " + SIMULA + ": Simula um jogo completo.");
 		System.out.println("- " + TIROS + ": Lista os tiros válidos realizados (* = tiro em navio, o = tiro na água)");
+		System.out.println("- " + HISTORICO + ": Mostra o histórico de jogos.");
 		System.out.println("- " + DESISTIR + ": Encerra o jogo.");
 		System.out.println("===============================================================");
 	}
