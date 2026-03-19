@@ -1,6 +1,3 @@
-/**
- * 
- */
 package battleship;
 
 /**
@@ -10,17 +7,16 @@ package battleship;
  * @author adrianolopes
  * @author miguelgoulao
  */
-public class Main
-{
+public class Main {
 	/**
 	 * Main.
 	 *
 	 * @param args the args
 	 */
-	public static void main(String[] args)
-    {
-		System.out.println("***  Battleship  ***");
+	public static void main(String[] args) {
+		Messages.configure(LanguageSupport.resolve(args));
+		System.out.println(Messages.get("app.title"));
 
 		Tasks.menu();
-    }
+	}
 }

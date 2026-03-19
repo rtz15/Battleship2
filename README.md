@@ -130,6 +130,31 @@ mvn test
 > [!TIP]
 > Use the `-Dtest=ClassName` flag to run specific test suites during development.
 
+## Internationalized Messages
+
+The CLI now keeps Portuguese as the default language and supports English for the main visible messages:
+- startup title
+- menu help
+- board legend
+- final goodbye and game-over text
+
+Quick local checks:
+```bash
+mvn test
+mvn -Dtest=LanguageSupportTest,LocalizationOutputTest test
+mvn package
+```
+
+To run the game in English:
+```bash
+java -jar target/BattleshipGamePlayer-2.0.jar --lang en
+```
+
+You can also use the environment variable:
+```bash
+BATTLESHIP_LANG=en java -jar target/BattleshipGamePlayer-2.0.jar
+```
+
 ---
 
 ## 🤝 Contributing

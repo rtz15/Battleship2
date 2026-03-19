@@ -82,9 +82,9 @@ public class Game implements IGame
 		System.out.println("-+");
 
 		if (showLegend) {
-			System.out.println("          LEGENDA");
-			System.out.println("'" + SHIP_MARKER + "'->navio, '" + SHIP_ADJACENT_MARKER + "'->adjacente a navio, '" + EMPTY_MARKER + "'->água");
-			System.out.println("'" + SHOT_SHIP_MARKER + "'->Tiro certeiro, '" + SHOT_WATER_MARKER + "'->Tiro na água");
+			System.out.println(Messages.get("board.legend.title"));
+			System.out.println(Messages.format("board.legend.line1", SHIP_MARKER, SHIP_ADJACENT_MARKER, EMPTY_MARKER));
+			System.out.println(Messages.format("board.legend.line2", SHOT_SHIP_MARKER, SHOT_WATER_MARKER));
 		}
 		System.out.println();
 	}
@@ -436,8 +436,8 @@ public class Game implements IGame
 
 	public void over() {
 			System.out.println();
-			System.out.println("+--------------------------------------------------------------+");
-			System.out.println("| Maldito sejas, Java Sparrow, eu voltarei, glub glub glub ... |");
-			System.out.println("+--------------------------------------------------------------+");
+			System.out.println(Messages.get("game.over.top"));
+			System.out.println(Messages.get("game.over.message"));
+			System.out.println(Messages.get("game.over.top"));
 	}
 }
