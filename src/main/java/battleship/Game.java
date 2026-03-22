@@ -4,11 +4,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.sql.Timestamp;
 import java.util.*;
 
 public class Game implements IGame
 {
+	private static final String GAME_OVER_MESSAGE = "Maldito sejas, Java Sparrow, eu voltarei, glub glub glub ...";
+
 	/**
 	 * Prints the game board by representing the positions of ships, adjacent tiles,
 	 * shots, and other game elements onto the console. The method also optionally
@@ -437,14 +441,141 @@ public class Game implements IGame
 		Game.printBoard(this.alienFleet, this.myMoves, show_shots, show_legend);
 	}
 
+	GameSummary createSummary() {
+		List<MoveSummary> moveSummaries = this.alienMoves.stream()
+				.map(this::buildMoveSummary)
+				.toList();
+		int totalShots = this.alienMoves.stream()
+				.mapToInt(move -> move.getShots().size())
+				.sum();
+		int totalMissedShots = moveSummaries.stream()
+				.mapToInt(MoveSummary::missedShots)
+				.sum();
+
+		List<String> fleetStatus = new ArrayList<>();
+		List<IShip> orderedShips = new ArrayList<>(this.myFleet.getShips());
+		orderedShips.sort(Comparator
+				.comparing(IShip::getCategory)
+				.thenComparing(ship -> ship.getPosition().toString()));
+
+		for (IShip ship : orderedShips) {
+			String status = ship.stillFloating() ? "A flutuar" : "Afundado";
+			fleetStatus.add(ship.getCategory() + " @ " + ship.getPosition() + " - " + status);
+		}
+
+		String finalResult = this.getRemainingShips() == 0
+				? "Todos os navios do jogador foram afundados"
+				: "A simulacao terminou com navios ainda a flutuar";
+
+		return new GameSummary(
+				"Resumo da simulacao Battleship",
+				finalResult,
+				GAME_OVER_MESSAGE,
+				this.alienMoves.size(),
+				totalShots,
+				this.countHits,
+				this.countRepeatedShots,
+				this.countInvalidShots,
+				totalMissedShots,
+				this.countSinks,
+				this.getRemainingShips(),
+				fleetStatus,
+				moveSummaries
+		);
+	}
+
+	public Path exportSummary() throws IOException {
+		return exportSummary(PdfExporter.DEFAULT_OUTPUT_PATH);
+	}
+
+	public Path exportSummary(Path outputPath) throws IOException {
+		return PdfExporter.export(createSummary(), outputPath);
+	}
+
+	private MoveSummary buildMoveSummary(IMove move) {
+		int validShots = 0;
+		int repeatedShots = 0;
+		int outsideShots = 0;
+		int missedShots = 0;
+		int hits = 0;
+		int sunkShips = 0;
+		List<ShotSummary> shotSummaries = new ArrayList<>();
+
+		List<IPosition> shots = move.getShots();
+		List<ShotResult> results = move.getShotResults();
+
+		for (int index = 0; index < shots.size(); index++) {
+			IPosition shot = shots.get(index);
+			ShotResult result = results.get(index);
+
+			if (!result.valid()) {
+				outsideShots++;
+			} else if (result.repeated()) {
+				repeatedShots++;
+			} else if (result.ship() == null) {
+				validShots++;
+				missedShots++;
+			} else {
+				validShots++;
+				hits++;
+				if (result.sunk()) {
+					sunkShips++;
+				}
+			}
+
+			shotSummaries.add(new ShotSummary(shot.toString(), describeShotResult(result)));
+		}
+
+		return new MoveSummary(
+				move.getNumber(),
+				validShots,
+				repeatedShots,
+				outsideShots,
+				missedShots,
+				hits,
+				sunkShips,
+				shotSummaries
+		);
+	}
+
+	private String describeShotResult(ShotResult result) {
+		if (!result.valid()) {
+			return "Exterior";
+		}
+		if (result.repeated()) {
+			return "Repetido";
+		}
+		if (result.ship() == null) {
+			return "Agua";
+		}
+		if (result.sunk()) {
+			return "Afundou " + result.ship().getCategory();
+		}
+		return "Acertou " + result.ship().getCategory();
+	}
+
 	public void over() {
 		System.out.println();
 		System.out.println("+--------------------------------------------------------------+");
-		System.out.println("| Maldito sejas, Java Sparrow, eu voltarei, glub glub glub ... |");
+		System.out.println("| " + GAME_OVER_MESSAGE + " |");
 		System.out.println("+--------------------------------------------------------------+");
+
+		try {
+			Path pdfPath = exportSummary();
+			System.out.println("Resumo PDF gerado em: " + pdfPath.toAbsolutePath());
+		} catch (IOException e) {
+			System.err.println("Nao foi possivel gerar o PDF: " + e.getMessage());
+		}
 
 		int totalMoves = alienMoves.size();
 		String result = (getRemainingShips() == 0) ? "WIN" : "LOSS";
-		gameHistory.saveGame(new Timestamp(System.currentTimeMillis()), totalMoves, getHits(), getSunkShips(), getRemainingShips(), result);
+		gameHistory.saveGame(
+				new Timestamp(System.currentTimeMillis()),
+				totalMoves,
+				getHits(),
+				getSunkShips(),
+				getRemainingShips(),
+				result
+		);
 	}
 }

@@ -141,6 +141,23 @@ mvn test
 > [!TIP]
 > Use the `-Dtest=ClassName` flag to run specific test suites during development.
 
+## PDF Export
+
+The simulator now exports a PDF summary to `./output/summary.pdf` when a game reaches `game over`.
+
+Quick local checks:
+```bash
+mvn test
+mvn -Dtest=PdfExporterTest test
+mvn package
+```
+
+To generate the real PDF from the simulator:
+1. Run `battleship.Main` in IntelliJ.
+2. Use `gerafrota`.
+3. Use `simula` and wait until all ships sink.
+4. Confirm `output/summary.pdf` was created.
+
 ---
 
 ## 🤝 Contributing
