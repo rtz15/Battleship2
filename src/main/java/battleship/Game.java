@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.sql.Timestamp;
 import java.util.*;
 
 public class Game implements IGame
@@ -160,6 +161,7 @@ public class Game implements IGame
 	private Integer countHits;
 	private Integer countSinks;
 	private int moveNumber;
+	private final GameHistory gameHistory;
 
 	//------------------------------------------------------------------
 	public Game(IFleet myFleet)
@@ -176,6 +178,7 @@ public class Game implements IGame
 		this.countRepeatedShots = 0;
 		this.countHits = 0;
 		this.countSinks = 0;
+		this.gameHistory = new GameHistory();
 	}
 
 	@Override
@@ -552,15 +555,26 @@ public class Game implements IGame
 	}
 
 	public void over() {
-			System.out.println();
-			System.out.println("+--------------------------------------------------------------+");
-			System.out.println("| " + GAME_OVER_MESSAGE + " |");
-			System.out.println("+--------------------------------------------------------------+");
-			try {
-				Path pdfPath = exportSummary();
-				System.out.println("Resumo PDF gerado em: " + pdfPath.toAbsolutePath());
-			} catch (IOException e) {
-				System.err.println("Nao foi possivel gerar o PDF: " + e.getMessage());
-			}
-	}
+    System.out.println();
+    System.out.println("+--------------------------------------------------------------+");
+    System.out.println("| " + GAME_OVER_MESSAGE + " |");
+    System.out.println("+--------------------------------------------------------------+");
+
+    try {
+        Path pdfPath = exportSummary();
+        System.out.println("Resumo PDF gerado em: " + pdfPath.toAbsolutePath());
+    } catch (IOException e) {
+        System.err.println("Nao foi possivel gerar o PDF: " + e.getMessage());
+    }
+
+    int totalMoves = alienMoves.size();
+    String result = (getRemainingShips() == 0) ? "WIN" : "LOSS";
+    gameHistory.saveGame(
+            new Timestamp(System.currentTimeMillis()),
+            totalMoves,
+            getHits(),
+            getSunkShips(),
+            getRemainingShips(),
+            result
+    );
 }

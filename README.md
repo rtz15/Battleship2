@@ -29,6 +29,17 @@ $$(x, y) \in \{0, \dots, 9\} \times \{0, \dots, 9\}$$
 
 Hits are calculated based on the intersection of the shot vector and the ship's bounding box.
 
+### 📜 Game Commands
+- `gerafrota`: Generates a random fleet of ships.
+- `lefrota`: Allows you to create and load a custom fleet.
+- `estado`: Shows the current status of your fleet.
+- `mapa`: Displays the fleet map.
+- `rajada`: Performs a burst of fire.
+- `simula`: Simulates a complete game.
+- `tiros`: Lists the valid shots taken (* = shot on ship, o = shot in water).
+- `historico`: Displays the history of past games.
+- `desisto`: Ends the game.
+
 ---
 
 ## ✨ Key Features
