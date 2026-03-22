@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+import java.sql.Timestamp;
 import java.util.*;
 
 public class Game implements IGame
@@ -156,6 +157,7 @@ public class Game implements IGame
 	private Integer countHits;
 	private Integer countSinks;
 	private int moveNumber;
+	private final GameHistory gameHistory;
 
 	//------------------------------------------------------------------
 	public Game(IFleet myFleet)
@@ -172,6 +174,7 @@ public class Game implements IGame
 		this.countRepeatedShots = 0;
 		this.countHits = 0;
 		this.countSinks = 0;
+		this.gameHistory = new GameHistory();
 	}
 
 	@Override
@@ -435,9 +438,13 @@ public class Game implements IGame
 	}
 
 	public void over() {
-			System.out.println();
-			System.out.println("+--------------------------------------------------------------+");
-			System.out.println("| Maldito sejas, Java Sparrow, eu voltarei, glub glub glub ... |");
-			System.out.println("+--------------------------------------------------------------+");
+		System.out.println();
+		System.out.println("+--------------------------------------------------------------+");
+		System.out.println("| Maldito sejas, Java Sparrow, eu voltarei, glub glub glub ... |");
+		System.out.println("+--------------------------------------------------------------+");
+
+		int totalMoves = alienMoves.size();
+		String result = (getRemainingShips() == 0) ? "WIN" : "LOSS";
+		gameHistory.saveGame(new Timestamp(System.currentTimeMillis()), totalMoves, getHits(), getSunkShips(), getRemainingShips(), result);
 	}
 }
