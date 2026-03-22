@@ -555,26 +555,27 @@ public class Game implements IGame
 	}
 
 	public void over() {
-    System.out.println();
-    System.out.println("+--------------------------------------------------------------+");
-    System.out.println("| " + GAME_OVER_MESSAGE + " |");
-    System.out.println("+--------------------------------------------------------------+");
+		System.out.println();
+		System.out.println("+--------------------------------------------------------------+");
+		System.out.println("| " + GAME_OVER_MESSAGE + " |");
+		System.out.println("+--------------------------------------------------------------+");
 
-    try {
-        Path pdfPath = exportSummary();
-        System.out.println("Resumo PDF gerado em: " + pdfPath.toAbsolutePath());
-    } catch (IOException e) {
-        System.err.println("Nao foi possivel gerar o PDF: " + e.getMessage());
-    }
+		try {
+			Path pdfPath = exportSummary();
+			System.out.println("Resumo PDF gerado em: " + pdfPath.toAbsolutePath());
+		} catch (IOException e) {
+			System.err.println("Nao foi possivel gerar o PDF: " + e.getMessage());
+		}
 
-    int totalMoves = alienMoves.size();
-    String result = (getRemainingShips() == 0) ? "WIN" : "LOSS";
-    gameHistory.saveGame(
-            new Timestamp(System.currentTimeMillis()),
-            totalMoves,
-            getHits(),
-            getSunkShips(),
-            getRemainingShips(),
-            result
-    );
+		int totalMoves = alienMoves.size();
+		String result = (getRemainingShips() == 0) ? "WIN" : "LOSS";
+		gameHistory.saveGame(
+				new Timestamp(System.currentTimeMillis()),
+				totalMoves,
+				getHits(),
+				getSunkShips(),
+				getRemainingShips(),
+				result
+		);
+	}
 }
