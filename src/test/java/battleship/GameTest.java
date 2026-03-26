@@ -1,5 +1,8 @@
 package battleship;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.junit.jupiter.api.*;
@@ -84,6 +87,24 @@ public class GameTest {
 		List<IPosition> positions = List.of(new Position(2, 3), new Position(2, 4), new Position(2, 5));
 		game.fireShots(positions);
 		assertEquals(1, game.getAlienMoves().size(), "Shots list should contain one shot after firing once.");
+	}
+
+	@Test
+	void fireShotsPrintsJsonResponseToConsole() {
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		PrintStream originalOut = System.out;
+		try {
+			System.setOut(new PrintStream(output, true, StandardCharsets.UTF_8));
+			game.fireShots(List.of(new Position(2, 3), new Position(2, 4), new Position(2, 5)));
+		} finally {
+			System.setOut(originalOut);
+		}
+
+		String consoleOutput = output.toString(StandardCharsets.UTF_8);
+		assertTrue(consoleOutput.contains("Jogada nº1 -> 3 tiros válidos: 3 tiros na água"));
+		assertTrue(consoleOutput.contains("\"validShots\" : 3"));
+		assertTrue(consoleOutput.contains("\"missedShots\" : 3"));
+		assertTrue(consoleOutput.contains("\"outsideShots\" : 0"));
 	}
 
 	@Test
