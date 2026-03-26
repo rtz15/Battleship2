@@ -88,7 +88,6 @@ You can access the generated Javadoc here:
 
 👉 [Battleship2 API Documentation](https://rtz15.github.io/Battleship2/)
 
-
 ### Core Logic
 ```java
 public class Ship {
@@ -106,7 +105,6 @@ public class Ship {
 ### Design Patterns Used:
 - **Strategy Pattern:** For different AI difficulty levels.
 - **Observer Pattern:** To update the UI when a ship is hit.
-</details>
 
 ### Logic Flow
 ```mermaid
@@ -143,14 +141,45 @@ mvn test
 
 ## PDF Export
 
-The simulator now exports a PDF summary to \./output/summary.pdf` when a game reaches `game over`.  147   148Quick local checks:   149 ````bash
+The simulator now exports a PDF summary to `./output/summary.pdf` when a game reaches `game over`.
+
+Quick local checks:
+```bash
 mvn test
 mvn -Dtest=PdfExporterTest test
 mvn package
-`To generate the real PDF from the simulator:`   156 `1. Run \`battleship.Main\` in IntelliJ.`   157 `2. Use \`gerafrota\`.`   158 `3. Use \`simula\` and wait until all ships sink.`   159 `4. Confirm \`output/summary.pdf\` was created.`   160   161 `## Internationalized Messages`   162   163 `The CLI now keeps Portuguese as the default language and supports English for the main visible messages:`   164 `- startup title`   165 `- menu help`   166 `- board legend`   167 `- final goodbye and game-over text`   168   169 `Quick local checks:`   170bash  171mvn test  172mvn -Dtest=LanguageSupportTest,LocalizationOutputTest test  173mvn package  174 ````   175   176To run the game in English:   177 ````bash
+```
+
+To generate the real PDF from the simulator:
+1. Run `battleship.Main` in IntelliJ.
+2. Use `gerafrota`.
+3. Use `simula` and wait until all ships sink.
+4. Confirm `output/summary.pdf` was created.
+
+## Internationalized Messages
+
+The CLI now keeps Portuguese as the default language and supports English for the main visible messages:
+- startup title
+- menu help
+- board legend
+- final goodbye and game-over text
+
+Quick local checks:
+```bash
+mvn test
+mvn -Dtest=LanguageSupportTest,LocalizationOutputTest test
+mvn package
+```
+
+To run the game in English:
+```bash
 java -jar target/BattleshipGamePlayer-2.0.jar --lang en
-`You can also use the environment variable:`   182bash  183BATTLESHIP_LANG=en java -jar target/BattleshipGamePlayer-2.0.jar`
-````
+```
+
+You can also use the environment variable:
+```bash
+BATTLESHIP_LANG=en java -jar target/BattleshipGamePlayer-2.0.jar
+```
 
 ---
 
