@@ -29,6 +29,17 @@ $$(x, y) \in \{0, \dots, 9\} \times \{0, \dots, 9\}$$
 
 Hits are calculated based on the intersection of the shot vector and the ship's bounding box.
 
+### 📜 Game Commands
+- `gerafrota`: Generates a random fleet of ships.
+- `lefrota`: Allows you to create and load a custom fleet.
+- `estado`: Shows the current status of your fleet.
+- `mapa`: Displays the fleet map.
+- `rajada`: Performs a burst of fire.
+- `simula`: Simulates a complete game.
+- `tiros`: Lists the valid shots taken (* = shot on ship, o = shot in water).
+- `historico`: Displays the history of past games.
+- `desisto`: Ends the game.
+
 ---
 
 ## ✨ Key Features
@@ -130,30 +141,16 @@ mvn test
 > [!TIP]
 > Use the `-Dtest=ClassName` flag to run specific test suites during development.
 
-## Internationalized Messages
+## PDF Export
 
-The CLI now keeps Portuguese as the default language and supports English for the main visible messages:
-- startup title
-- menu help
-- board legend
-- final goodbye and game-over text
-
-Quick local checks:
-```bash
+The simulator now exports a PDF summary to \./output/summary.pdf` when a game reaches `game over`.  147   148Quick local checks:   149 ````bash
 mvn test
-mvn -Dtest=LanguageSupportTest,LocalizationOutputTest test
+mvn -Dtest=PdfExporterTest test
 mvn package
-```
-
-To run the game in English:
-```bash
+`To generate the real PDF from the simulator:`   156 `1. Run \`battleship.Main\` in IntelliJ.`   157 `2. Use \`gerafrota\`.`   158 `3. Use \`simula\` and wait until all ships sink.`   159 `4. Confirm \`output/summary.pdf\` was created.`   160   161 `## Internationalized Messages`   162   163 `The CLI now keeps Portuguese as the default language and supports English for the main visible messages:`   164 `- startup title`   165 `- menu help`   166 `- board legend`   167 `- final goodbye and game-over text`   168   169 `Quick local checks:`   170bash  171mvn test  172mvn -Dtest=LanguageSupportTest,LocalizationOutputTest test  173mvn package  174 ````   175   176To run the game in English:   177 ````bash
 java -jar target/BattleshipGamePlayer-2.0.jar --lang en
-```
-
-You can also use the environment variable:
-```bash
-BATTLESHIP_LANG=en java -jar target/BattleshipGamePlayer-2.0.jar
-```
+`You can also use the environment variable:`   182bash  183BATTLESHIP_LANG=en java -jar target/BattleshipGamePlayer-2.0.jar`
+````
 
 ---
 
