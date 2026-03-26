@@ -88,7 +88,6 @@ You can access the generated Javadoc here:
 
 👉 [Battleship2 API Documentation](https://rtz15.github.io/Battleship2/)
 
-
 ### Core Logic
 ```java
 public class Ship {
@@ -106,7 +105,6 @@ public class Ship {
 ### Design Patterns Used:
 - **Strategy Pattern:** For different AI difficulty levels.
 - **Observer Pattern:** To update the UI when a ship is hit.
-</details>
 
 ### Logic Flow
 ```mermaid
@@ -157,6 +155,31 @@ To generate the real PDF from the simulator:
 2. Use `gerafrota`.
 3. Use `simula` and wait until all ships sink.
 4. Confirm `output/summary.pdf` was created.
+
+## Internationalized Messages
+
+The CLI now keeps Portuguese as the default language and supports English for the main visible messages:
+- startup title
+- menu help
+- board legend
+- final goodbye and game-over text
+
+Quick local checks:
+```bash
+mvn test
+mvn -Dtest=LanguageSupportTest,LocalizationOutputTest test
+mvn package
+```
+
+To run the game in English:
+```bash
+java -jar target/BattleshipGamePlayer-2.0.jar --lang en
+```
+
+You can also use the environment variable:
+```bash
+BATTLESHIP_LANG=en java -jar target/BattleshipGamePlayer-2.0.jar
+```
 
 ---
 
