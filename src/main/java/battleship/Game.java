@@ -345,7 +345,8 @@ public class Game implements IGame
 
 //		System.out.println(move);
 
-		move.processEnemyFire(true);
+		String responseJson = move.processEnemyFire(true);
+		System.out.println(responseJson);
 
 		alienMoves.add(move);
 
