@@ -2,21 +2,22 @@
 
 ## Smell escolhido
 
-- Smell: `OverlyComplexMethod`
-- Metodo alvo: `Tasks.menu()`
-- Ficheiro: `src/main/java/battleship/Tasks.java`
+- Smell: `MethodWithMultipleReturnPoints`
+- Metodo alvo: `AppLanguage.fromCode(String)`
+- Ficheiro: `src/main/java/battleship/AppLanguage.java`
 
 ## Justificacao
 
-O requisito de i18n introduziu classes de suporte leves (`AppLanguage`, `LanguageSupport`, `Messages`), mas a integracao do comportamento visivel ao utilizador ficou concentrada em classes centrais.
+O requisito de i18n introduziu classes de suporte leves (`AppLanguage`, `LanguageSupport`, `Messages`), e o smell escolhido foi isolado diretamente numa dessas classes.
 
-Nas metricas exportadas pelo MetricsTree, `Tasks.menu()` aparece como um hotspot defensavel para a parte 2A:
+Em `AppLanguage.fromCode(String)` existe logica de selecao da lingua com varios pontos de retorno:
 
-- `CC = 22`
-- `LOC = 83`
-- `CCM = 12`
+- `return PORTUGUESE` para entrada nula ou vazia
+- `return ENGLISH` se o codigo comecar por `en`
+- `return PORTUGUESE` se o codigo comecar por `pt`
+- `return PORTUGUESE` como fallback final
 
-Isto torna `Tasks.menu()` um candidato claro a `Long Method` / metodo excessivamente complexo, e o Qodana consegue detetar esse problema pela inspecao `OverlyComplexMethod`.
+Isto torna `AppLanguage.fromCode(String)` um candidato claro a `MethodWithMultipleReturnPoints`, e o Qodana consegue detetar esse problema por essa inspecao. A documentacao oficial do Inspectopedia indica que metodos com demasiados pontos de retorno podem ser confusos e mais dificeis de refatorar.
 
 ## Configuracao adicionada
 
@@ -27,15 +28,15 @@ Isto torna `Tasks.menu()` um candidato claro a `Long Method` / metodo excessivam
 
 1. Usa `qodana-jvm-community`, para nao depender de licenca paga nem de `QODANA_TOKEN`.
 2. Usa o perfil `empty`.
-3. Inclui apenas a inspecao `OverlyComplexMethod`.
-4. Limita essa inspecao ao ficheiro `src/main/java/battleship/Tasks.java`.
+3. Inclui apenas a inspecao `MethodWithMultipleReturnPoints`.
+4. Limita essa inspecao ao ficheiro `src/main/java/battleship/AppLanguage.java`.
 5. Define um quality gate no workflow com `fail-threshold: 0`.
 
 Na pratica, o workflow falha se o Qodana detetar pelo menos um problema dessa inspecao no ficheiro alvo.
 
 ## Resultado esperado
 
-O resultado esperado e que o workflow sinalize `Tasks.menu()` como metodo excessivamente complexo.
+O resultado esperado e que o workflow sinalize `AppLanguage.fromCode(String)` como metodo com multiplos pontos de retorno.
 
 Se o relatorio nao assinalar problemas, isso significa uma destas coisas:
 
