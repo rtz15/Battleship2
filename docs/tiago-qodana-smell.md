@@ -17,7 +17,7 @@ Em `AppLanguage.fromCode(String)` existe logica de selecao da lingua com varios 
 - `return PORTUGUESE` se o codigo comecar por `pt`
 - `return PORTUGUESE` como fallback final
 
-Isto torna `AppLanguage.fromCode(String)` um candidato claro a `MethodWithMultipleReturnPoints`, e o Qodana consegue detetar esse problema por essa inspecao. A documentacao oficial do Inspectopedia indica que metodos com demasiados pontos de retorno podem ser confusos e mais dificeis de refatorar.
+Isto torna `AppLanguage.fromCode(String)` um candidato plausivel a `MethodWithMultipleReturnPoints`. A documentacao oficial do Inspectopedia indica que metodos com demasiados pontos de retorno podem ser confusos e mais dificeis de refatorar.
 
 ## Configuracao adicionada
 
@@ -32,7 +32,7 @@ Isto torna `AppLanguage.fromCode(String)` um candidato claro a `MethodWithMultip
 4. Limita essa inspecao ao ficheiro `src/main/java/battleship/AppLanguage.java`.
 5. Define um quality gate no workflow com `fail-threshold: 0`.
 
-Na pratica, o workflow falha se o Qodana detetar pelo menos um problema dessa inspecao no ficheiro alvo.
+Na pratica, o workflow considera falha sempre que o Qodana reportar pelo menos um problema dessa inspecao no ficheiro alvo.
 
 ## Resultado obtido
 
@@ -44,19 +44,8 @@ No run mais recente, o sumario apresentado pelo GitHub UI foi:
 
 Assim, a execucao do workflow e do quality gate ficou validada, mas sem findings reportaveis nas annotations apresentadas pelo GitHub.
 
-## Passos manuais finais
+## Conclusao
 
-1. Manter a issue e a pull request alinhadas com o smell final escolhido:
-   - `MethodWithMultipleReturnPoints`
-   - `AppLanguage.fromCode(String)`
-2. Registar na issue e na PR que o workflow correu com sucesso mas sem findings reportaveis.
-3. Aguardar revisao e merge da pull request.
-4. Depois do merge, confirmar o fecho automatico da issue associada.
+Foi configurado um workflow de GitHub Actions com Qodana especificamente para avaliar o smell `MethodWithMultipleReturnPoints` no metodo `AppLanguage.fromCode(String)`.
 
-## Opcional
-
-Se quiseres integrar com Qodana Cloud mais tarde:
-
-1. criar um projeto em Qodana Cloud
-2. guardar o token em `QODANA_TOKEN`
-3. adicionar esse secret ao step `Qodana Scan`
+O workflow executou com sucesso e o quality gate ficou operacional, mas a execucao analisada nao produziu findings reportaveis para a inspecao configurada.
