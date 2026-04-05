@@ -34,22 +34,24 @@ Isto torna `AppLanguage.fromCode(String)` um candidato claro a `MethodWithMultip
 
 Na pratica, o workflow falha se o Qodana detetar pelo menos um problema dessa inspecao no ficheiro alvo.
 
-## Resultado esperado
+## Resultado obtido
 
-O resultado esperado e que o workflow sinalize `AppLanguage.fromCode(String)` como metodo com multiplos pontos de retorno.
+O workflow do Qodana foi executado com sucesso em GitHub Actions com a inspecao `MethodWithMultipleReturnPoints` aplicada ao ficheiro `src/main/java/battleship/AppLanguage.java`.
 
-Se o relatorio nao assinalar problemas, isso significa uma destas coisas:
+No run mais recente, o sumario apresentado pelo GitHub UI foi:
 
-- o metodo foi entretanto refatorado e deixou de ultrapassar o limiar da inspecao
-- a configuracao do projeto no runner nao permitiu ao Qodana importar o projeto corretamente
+`No new problems were found according to the checks applied`
+
+Assim, a execucao do workflow e do quality gate ficou validada, mas sem findings reportaveis nas annotations apresentadas pelo GitHub.
 
 ## Passos manuais finais
 
-1. Fazer `git add`, `commit` e `push` da branch.
-2. No GitHub, abrir uma pull request para `main` ou correr manualmente o workflow em `Actions`.
-3. Abrir o workflow `Qodana Tiago i18n smell gate`.
-4. Confirmar que o job falha ou gera anotacoes no `Tasks.java`.
-5. Abrir o artefacto/SARIF se precisares de mostrar a localizacao exata do smell.
+1. Manter a issue e a pull request alinhadas com o smell final escolhido:
+   - `MethodWithMultipleReturnPoints`
+   - `AppLanguage.fromCode(String)`
+2. Registar na issue e na PR que o workflow correu com sucesso mas sem findings reportaveis.
+3. Aguardar revisao e merge da pull request.
+4. Depois do merge, confirmar o fecho automatico da issue associada.
 
 ## Opcional
 
