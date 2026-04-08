@@ -1,5 +1,7 @@
 # ⚓ Battleship 2.0
 
+> Ficha 2 demo video: [Watch on YouTube](https://youtu.be/S00AQphHRkE)
+
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
 ![Java Version](https://img.shields.io/badge/Java-21%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
