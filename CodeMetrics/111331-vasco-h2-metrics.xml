@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Placeholder para entrega da ficha 3.
+  Commit de referencia confirmado: 29e8c36d057ae453bb11019f6677326fe97fcb91 (ultimo commit no ramo feature/h2-history antes de abrir PR #2).
+  Este ficheiro deve ser substituido pela exportacao real do MetricsTree (Project Metrics -> XML) feita nesse commit.
+-->
+<metricsExport student="111331" member="Vasco Rodrigues" requirement="H2 history"
+               sourceCommit="29e8c36d057ae453bb11019f6677326fe97fcb91"
+               status="pending-manual-metricstree-export" />
