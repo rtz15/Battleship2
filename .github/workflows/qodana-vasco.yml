@@ -29,7 +29,7 @@ jobs:
       - name: Qodana Scan (CallToPrintStackTrace)
         uses: JetBrains/qodana-action@v2025.3
         with:
-          args: --config,qodana-vasco.yaml --fail-threshold 0
+          args: --config,qodana-vasco.yaml,--fail-threshold,0
           pr-mode: false
           upload-result: true
           use-annotations: true

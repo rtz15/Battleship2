@@ -17,3 +17,10 @@ acoplado a `stderr`, dificultando controlo operacional e testes.
 - Inspecao ativa: `CallToPrintStackTrace`
 - Escopo limitado ao ficheiro `GameHistory.java`
 - Gate: `--fail-threshold 0`
+
+## Nota de validacao
+O ficheiro alvo contem chamadas a `printStackTrace()` em blocos `catch`, pelo que a configuracao deve
+ser validada diretamente pelo run do GitHub Actions e pelo respetivo comentario do Qodana na PR.
+
+Se o run nao reportar findings, deve confirmar-se primeiro se a inspecao esta realmente a ser aplicada
+com a configuracao pretendida antes de fechar a analise como concluida.
