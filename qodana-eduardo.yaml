@@ -1,0 +1,12 @@
+# 110894 - Eduardo Sousa
+version: "1.0"
+linter: qodana-jvm-community
+projectJDK: 21
+
+profile:
+  name: empty
+
+include:
+  - name: UnusedDeclaration
+    paths:
+      - src/main/java/battleship/PdfExporter.java
