@@ -1,0 +1,42 @@
+# Aluno: 111331 Vasco Reis Teixeira
+name: Qodana Vasco H2 smell gate
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  qodana:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
+      security-events: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Qodana Scan (CallToPrintStackTrace)
+        uses: JetBrains/qodana-action@v2025.3
+        with:
+          args: --config,qodana-vasco.yaml,--fail-threshold,0
+          pr-mode: false
+          upload-result: true
+          use-annotations: true
+          post-pr-comment: true
+
+      - name: Upload SARIF report
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ runner.temp }}/qodana/results/qodana.sarif.json
