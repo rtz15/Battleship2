@@ -1,0 +1,11 @@
+version: "1.0"
+linter: qodana-jvm-community
+projectJDK: 21
+
+profile:
+  name: empty
+
+include:
+  - name: MethodWithMultipleReturnPoints
+    paths:
+      - src/main/java/battleship/AppLanguage.java
