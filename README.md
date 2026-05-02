@@ -57,7 +57,7 @@ Hits are calculated based on the intersection of the shot vector and the ship's 
 ## 🛠 Technical Stack
 * **Language:** Java 21
 * **Build Tool:** Maven / Gradle
-* **Testing:** JUnit 5
+* **Testing:** JUnit 6
 * **Logging:** Log4j2
 
 ---
@@ -136,6 +136,13 @@ graph TD
 We use high-coverage unit testing to ensure game stability. Run tests using:
 ```bash
 mvn test
+```
+
+Continuous integration is configured in [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
+On each `push` and on each `pull_request` targeting `main`, GitHub Actions provisions JDK 21 and runs:
+
+```bash
+mvn -B clean verify javadoc:javadoc --file pom.xml
 ```
 
 > [!TIP]
