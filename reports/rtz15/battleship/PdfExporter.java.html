@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PdfExporter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">BattleshipGame</a> &gt; <a href="index.source.html" class="el_package">battleship</a> &gt; <span class="el_source">PdfExporter.java</span></div><h1>PdfExporter.java</h1><pre class="source lang-java linenums">package battleship;
+
+import org.openpdf.text.Document;
+import org.openpdf.text.DocumentException;
+import org.openpdf.text.Paragraph;
+import org.openpdf.text.pdf.PdfWriter;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Objects;
+
+public final class PdfExporter {
+<span class="fc" id="L15">	public static final Path DEFAULT_OUTPUT_PATH = Path.of(&quot;output&quot;, &quot;summary.pdf&quot;);</span>
+
+	private PdfExporter() {
+	}
+
+	public static Path export(GameSummary summary) throws IOException {
+<span class="fc" id="L21">		return export(summary, DEFAULT_OUTPUT_PATH);</span>
+	}
+
+	public static Path export(GameSummary summary, Path outputPath) throws IOException {
+<span class="fc" id="L25">		Objects.requireNonNull(summary, &quot;summary must not be null&quot;);</span>
+<span class="fc" id="L26">		Objects.requireNonNull(outputPath, &quot;outputPath must not be null&quot;);</span>
+
+<span class="fc" id="L28">		Path absolutePath = outputPath.toAbsolutePath();</span>
+<span class="fc" id="L29">		Path parent = absolutePath.getParent();</span>
+<span class="pc bpc" id="L30" title="1 of 2 branches missed.">		if (parent != null) {</span>
+<span class="fc" id="L31">			Files.createDirectories(parent);</span>
+		}
+
+<span class="fc" id="L34">		Document document = new Document();</span>
+<span class="fc" id="L35">		try (OutputStream outputStream = Files.newOutputStream(absolutePath)) {</span>
+<span class="fc" id="L36">			PdfWriter.getInstance(document, outputStream);</span>
+<span class="fc" id="L37">			document.open();</span>
+<span class="fc" id="L38">			addLine(document, summary.title());</span>
+<span class="fc" id="L39">			addBlankLine(document);</span>
+<span class="fc" id="L40">			addLine(document, &quot;Resultado final: &quot; + summary.finalResult());</span>
+<span class="fc" id="L41">			addLine(document, &quot;Jogadas totais: &quot; + summary.totalMoves());</span>
+<span class="fc" id="L42">			addLine(document, &quot;Tiros registados: &quot; + summary.totalShots());</span>
+<span class="fc" id="L43">			addLine(document, &quot;Acertos totais: &quot; + summary.totalHits());</span>
+<span class="fc" id="L44">			addLine(document, &quot;Tiros repetidos: &quot; + summary.totalRepeatedShots());</span>
+<span class="fc" id="L45">			addLine(document, &quot;Tiros exteriores: &quot; + summary.totalOutsideShots());</span>
+<span class="fc" id="L46">			addLine(document, &quot;Tiros na agua: &quot; + summary.totalMissedShots());</span>
+<span class="fc" id="L47">			addLine(document, &quot;Navios afundados: &quot; + summary.totalSunkShips());</span>
+<span class="fc" id="L48">			addLine(document, &quot;Navios restantes: &quot; + summary.remainingShips());</span>
+<span class="fc" id="L49">			addBlankLine(document);</span>
+<span class="fc" id="L50">			addLine(document, &quot;Estado final da frota:&quot;);</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">			for (String line : summary.fleetStatus()) {</span>
+<span class="fc" id="L52">				addLine(document, &quot; - &quot; + line);</span>
+<span class="fc" id="L53">			}</span>
+<span class="fc" id="L54">			addBlankLine(document);</span>
+<span class="fc" id="L55">			addLine(document, &quot;Detalhe das jogadas:&quot;);</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">			for (MoveSummary moveSummary : summary.moveSummaries()) {</span>
+<span class="fc" id="L57">				addBlankLine(document);</span>
+<span class="fc" id="L58">				addLine(document, &quot;Jogada &quot; + moveSummary.number());</span>
+<span class="fc" id="L59">				addLine(document, &quot;  validos=&quot; + moveSummary.validShots()</span>
+<span class="fc" id="L60">						+ &quot;, repetidos=&quot; + moveSummary.repeatedShots()</span>
+<span class="fc" id="L61">						+ &quot;, exteriores=&quot; + moveSummary.outsideShots()</span>
+<span class="fc" id="L62">						+ &quot;, agua=&quot; + moveSummary.missedShots()</span>
+<span class="fc" id="L63">						+ &quot;, acertos=&quot; + moveSummary.hits()</span>
+<span class="fc" id="L64">						+ &quot;, afundados=&quot; + moveSummary.sunkShips());</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">				for (ShotSummary shotSummary : moveSummary.shotSummaries()) {</span>
+<span class="fc" id="L66">					addLine(document, &quot;  &quot; + shotSummary.position() + &quot; -&gt; &quot; + shotSummary.outcome());</span>
+<span class="fc" id="L67">				}</span>
+<span class="fc" id="L68">			}</span>
+<span class="fc" id="L69">			addBlankLine(document);</span>
+<span class="fc" id="L70">			addLine(document, &quot;Mensagem final: &quot; + summary.finalMessage());</span>
+<span class="fc" id="L71">			document.close();</span>
+<span class="nc" id="L72">		} catch (DocumentException e) {</span>
+<span class="nc" id="L73">			throw new IOException(&quot;Falha ao escrever o PDF&quot;, e);</span>
+<span class="fc" id="L74">		}</span>
+
+<span class="fc" id="L76">		return absolutePath;</span>
+	}
+
+	private static void addLine(Document document, String text) throws DocumentException {
+<span class="fc" id="L80">		document.add(new Paragraph(text));</span>
+<span class="fc" id="L81">	}</span>
+
+	private static void addBlankLine(Document document) throws DocumentException {
+<span class="fc" id="L84">		document.add(new Paragraph(&quot; &quot;));</span>
+<span class="fc" id="L85">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
