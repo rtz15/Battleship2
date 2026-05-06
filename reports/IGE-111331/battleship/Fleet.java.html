@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Fleet.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">BattleshipGame</a> &gt; <a href="index.source.html" class="el_package">battleship</a> &gt; <span class="el_source">Fleet.java</span></div><h1>Fleet.java</h1><pre class="source lang-java linenums">/**
+ * 
+ */
+package battleship;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * The type Fleet.
+ */
+<span class="fc" id="L12">public class Fleet implements IFleet</span>
+{
+	/**
+	 * Creates a randomly generated fleet containing ships of various predefined types.
+	 * Each ship is assigned a random bearing and position. If a ship cannot be added
+	 * due to constraints (e.g., collision or boundary issues), it will be retried.
+	 *
+	 * @return a fully constructed and valid fleet as an instance of IFleet
+	 */
+	public static IFleet createRandom() {
+
+<span class="fc" id="L23">		Fleet randomFleet = new Fleet();</span>
+
+		// Define the types of ships to be added
+<span class="fc" id="L26">		String[] shipTypes =</span>
+					{&quot;galeao&quot;,                           // 1 galleon
+				 	&quot;fragata&quot;,                           // 1 frigate
+ 				 	&quot;nau&quot;, &quot;nau&quot;,                        // 2 carracks
+					&quot;caravela&quot;, &quot;caravela&quot;, &quot;caravela&quot;,  // 3 caravels
+					&quot;barca&quot;, &quot;barca&quot;, &quot;barca&quot;, &quot;barca&quot;}; // 4 barges
+
+<span class="fc" id="L33">		int fleetSize = 0;</span>
+
+<span class="fc bfc" id="L35" title="All 2 branches covered.">		while (fleetSize &lt; shipTypes.length) {</span>
+
+			// Build the ship
+<span class="fc" id="L38">			Ship ship = Ship.buildShip(shipTypes[fleetSize], Compass.randomBearing(), Position.randomPosition());</span>
+
+			// Attempt to add the ship to the fleet
+<span class="pc bpc" id="L41" title="1 of 4 branches missed.">			if (ship != null &amp;&amp; randomFleet.addShip(ship)) {</span>
+<span class="fc" id="L42">				fleetSize++; // Increment count if ship is successfully added</span>
+			}
+<span class="fc" id="L44">		}</span>
+<span class="fc" id="L45">		return randomFleet;</span>
+	}
+
+
+    // -----------------------------------------------------
+
+	/**
+	 * The Ships.
+	 */
+	private final List&lt;IShip&gt; ships;
+
+	// -----------------------------------------------------ge
+	/**
+	 * Instantiates a new Fleet.
+	 */
+	public Fleet()
+<span class="fc" id="L61">    {</span>
+<span class="fc" id="L62">	ships = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L63">    }</span>
+
+	/**
+	 * Gets ships.
+	 *
+	 * @return the ships
+	 */
+	@Override
+    public List&lt;IShip&gt; getShips()
+    {
+<span class="fc" id="L73">	return ships;</span>
+    }
+	
+	/**
+	 * Add ship boolean.
+	 *
+	 * @param s the s
+	 * @return the boolean
+	 */
+	/*
+     * (non-Javadoc)
+     * 
+     * @see battleship.IFleet#addShip(battleship.IShip)
+     */
+    @Override
+    public boolean addShip(IShip s)
+    {
+<span class="pc bpc" id="L90" title="1 of 2 branches missed.">		assert s != null;</span>
+
+<span class="fc" id="L92">		boolean result = false;</span>
+<span class="pc bpc" id="L93" title="1 of 6 branches missed.">		if ((ships.size() &lt;= FLEET_SIZE) &amp;&amp; (isInsideBoard(s)) &amp;&amp; (!colisionRisk(s)))</span>
+		{
+<span class="fc" id="L95">			ships.add(s);</span>
+<span class="fc" id="L96">			result = true;</span>
+		}
+<span class="fc" id="L98">		return result;</span>
+    }
+
+	/**
+	 * Gets ships like.
+	 *
+	 * @param category the category
+	 * @return the ships like
+	 */
+	/*
+     * (non-Javadoc)
+     * 
+     * @see battleship.IFleet#getShipsLike(java.lang.String)
+     */
+    @Override
+    public List&lt;IShip&gt; getShipsLike(String category)
+    {
+<span class="pc bpc" id="L115" title="1 of 2 branches missed.">		assert category != null;</span>
+
+<span class="fc" id="L117">		List&lt;IShip&gt; shipsLike = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L118" title="All 2 branches covered.">		for (IShip s : ships)</span>
+<span class="pc bpc" id="L119" title="1 of 2 branches missed.">			if (s.getCategory().equals(category))</span>
+<span class="fc" id="L120">				shipsLike.add(s);</span>
+
+<span class="fc" id="L122">		return shipsLike;</span>
+    }
+
+	/**
+	 * Gets floating ships.
+	 *
+	 * @return the floating ships
+	 */
+	/*
+     * (non-Javadoc)
+     * 
+     * @see battleship.IFleet#getFloatingShips()
+     */
+    @Override
+    public List&lt;IShip&gt; getFloatingShips()
+    {
+<span class="fc" id="L138">		List&lt;IShip&gt; floatingShips = new ArrayList&lt;IShip&gt;();</span>
+<span class="fc bfc" id="L139" title="All 2 branches covered.">		for (IShip s : ships)</span>
+<span class="fc bfc" id="L140" title="All 2 branches covered.">			if (s.stillFloating())</span>
+<span class="fc" id="L141">				floatingShips.add(s);</span>
+
+<span class="fc" id="L143">		return floatingShips;</span>
+    }
+
+	/**
+	 * Gets sunk ships.
+	 *
+	 * @return the sunk ships
+	 */
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see battleship.IFleet#getSunkShips()
+	 */
+	@Override
+	public List&lt;IShip&gt; getSunkShips()
+	{
+<span class="fc" id="L159">		List&lt;IShip&gt; sunkShips = new ArrayList&lt;IShip&gt;();</span>
+<span class="fc bfc" id="L160" title="All 2 branches covered.">		for (IShip s : ships)</span>
+<span class="fc bfc" id="L161" title="All 2 branches covered.">			if (!s.stillFloating())</span>
+<span class="fc" id="L162">				sunkShips.add(s);</span>
+
+<span class="fc" id="L164">		return sunkShips;</span>
+	}
+
+	/**
+	 * Ship at ship.
+	 *
+	 * @param pos the pos
+	 * @return the ship
+	 */
+	/*
+     * (non-Javadoc)
+     * 
+     * @see battleship.IFleet#shipAt(battleship.IPosition)
+     */
+    @Override
+    public IShip shipAt(IPosition pos)
+    {
+<span class="pc bpc" id="L181" title="1 of 2 branches missed.">		assert pos != null;</span>
+
+<span class="fc bfc" id="L183" title="All 2 branches covered.">		for (IShip ship : ships)</span>
+<span class="fc bfc" id="L184" title="All 2 branches covered.">			if (ship.occupies(pos))</span>
+<span class="fc" id="L185">				return ship;</span>
+<span class="fc" id="L186">		return null;</span>
+    }
+
+	/**
+	 * Is inside board boolean.
+	 *
+	 * @param s the s
+	 * @return the boolean
+	 */
+	private boolean isInsideBoard(IShip s)
+    {
+<span class="pc bpc" id="L197" title="1 of 2 branches missed.">		assert s != null;</span>
+
+<span class="pc bpc" id="L199" title="1 of 6 branches missed.">		return (s.getLeftMostPos() &gt;= 0 &amp;&amp; s.getRightMostPos() &lt;= Game.BOARD_SIZE - 1 &amp;&amp; s.getTopMostPos() &gt;= 0</span>
+<span class="fc bfc" id="L200" title="All 2 branches covered.">			&amp;&amp; s.getBottomMostPos() &lt;= Game.BOARD_SIZE - 1);</span>
+    }
+
+	/**
+	 * Colision risk boolean.
+	 *
+	 * @param s the s
+	 * @return the boolean
+	 */
+	private boolean colisionRisk(IShip s)
+    {
+<span class="pc bpc" id="L211" title="1 of 2 branches missed.">		assert s != null;</span>
+
+<span class="fc bfc" id="L213" title="All 2 branches covered.">		for (int i = 0; i &lt; ships.size(); i++)</span>
+		{
+<span class="fc bfc" id="L215" title="All 2 branches covered.">			if (ships.get(i).tooCloseTo(s))</span>
+<span class="fc" id="L216">				return true;</span>
+		}
+<span class="fc" id="L218">		return false;</span>
+    }
+
+	/**
+	 * This operation prints all the given ships
+	 *
+	 * @param ships The list of ships
+	 */
+	public void printShips(List&lt;IShip&gt; ships)
+	{
+<span class="nc bnc" id="L228" title="All 2 branches missed.">		assert ships != null;</span>
+
+<span class="nc bnc" id="L230" title="All 2 branches missed.">		for (IShip ship : ships)</span>
+<span class="nc" id="L231">			System.out.println(ship);</span>
+<span class="nc" id="L232">	}</span>
+
+	/**
+	 * This operation shows the state of a fleet
+	 */
+	public void printStatus()
+    {
+<span class="fc" id="L239">		System.out.println(&quot;Estado da Frota: &quot; + this.getFloatingShips().size() + &quot; a flutuar, &quot; + this.getSunkShips().size() + &quot; afundados!&quot;);</span>
+//		printAllShips();
+//		printFloatingShips();
+//		printShipsByCategory(&quot;Galeao&quot;);
+//		printShipsByCategory(&quot;Fragata&quot;);
+//		printShipsByCategory(&quot;Nau&quot;);
+//		printShipsByCategory(&quot;Caravela&quot;);
+//		printShipsByCategory(&quot;Barca&quot;);
+<span class="fc" id="L247">    }</span>
+
+	/**
+	 * This operation prints all the ships of a fleet belonging to a particular
+	 * category
+	 *
+	 * @param category The category of ships of interest
+	 */
+	public void printShipsByCategory(String category)
+    {
+<span class="nc bnc" id="L257" title="All 2 branches missed.">		assert category != null;</span>
+
+<span class="nc" id="L259">		printShips(getShipsLike(category));</span>
+<span class="nc" id="L260">    }</span>
+
+	/**
+	 * This operation prints all the ships of a fleet but not yet shot
+	 */
+	public void printFloatingShips()
+    {
+<span class="nc" id="L267">	printShips(getFloatingShips());</span>
+<span class="nc" id="L268">    }</span>
+
+	/**
+	 * This operation prints all the ships of a fleet
+	 */
+	void printAllShips()
+    {
+<span class="nc" id="L275">		printShips(ships);</span>
+<span class="nc" id="L276">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
