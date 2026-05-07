@@ -8,6 +8,8 @@ enum AppLanguage {
 	PORTUGUESE("pt", ULocale.forLanguageTag("pt-PT")),
 	ENGLISH("en", ULocale.ENGLISH);
 
+	private static final AppLanguage DEFAULT_LANGUAGE = PORTUGUESE;
+
 	private final String code;
 	private final ULocale locale;
 
@@ -25,14 +27,25 @@ enum AppLanguage {
 	}
 
 	public static AppLanguage fromCode(String code) {
-		if (code == null || code.isBlank())
-			return PORTUGUESE;
+		String normalizedCode = normalize(code);
+		if (normalizedCode == null)
+			return DEFAULT_LANGUAGE;
 
-		String normalized = code.trim().toLowerCase(Locale.ROOT);
-		if (normalized.startsWith(ENGLISH.code))
-			return ENGLISH;
-		if (normalized.startsWith(PORTUGUESE.code))
-			return PORTUGUESE;
-		return PORTUGUESE;
+		for (AppLanguage language : values()) {
+			if (language.matches(normalizedCode))
+				return language;
+		}
+
+		return DEFAULT_LANGUAGE;
+	}
+
+	private static String normalize(String code) {
+		if (code == null || code.isBlank())
+			return null;
+		return code.trim().toLowerCase(Locale.ROOT);
+	}
+
+	private boolean matches(String normalizedCode) {
+		return normalizedCode.startsWith(code);
 	}
 }
