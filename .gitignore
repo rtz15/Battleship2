@@ -1,0 +1,16 @@
+# macOS and shell artifacts
+.DS_Store
+.Rhistory
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Maven and generated outputs
+target/
+output/
+*.exec
+
+# Local H2 database files
+battleship_history.mv.db
+battleship_history.trace.db

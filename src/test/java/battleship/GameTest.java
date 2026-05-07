@@ -27,12 +27,14 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GameTest {
 
 	private static final String DB_FILE = "./battleship_history.mv.db";
+	private static final String DB_TRACE_FILE = "./battleship_history.trace.db";
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	private Game game;
@@ -55,14 +57,19 @@ class GameTest {
 	@DisplayName("Game constructor initializes counters and move lists")
 	void constructorInitializesState() {
 		assertAll(
-				() -> assertNotNull(game, "Error: expected the game instance to exist after construction."),
-				() -> assertNotNull(game.getAlienMoves(), "Error: expected alien moves to be initialized."),
-				() -> assertTrue(game.getAlienMoves().isEmpty(), "Error: expected alien moves to start empty."),
-				() -> assertEquals(0, game.getInvalidShots(), "Error: expected invalid shots to start at zero."),
-				() -> assertEquals(0, game.getRepeatedShots(), "Error: expected repeated shots to start at zero."),
-				() -> assertEquals(0, game.getHits(), "Error: expected hits to start at zero."),
-				() -> assertEquals(0, game.getSunkShips(), "Error: expected sunk ships to start at zero.")
-		);
+					() -> assertNotNull(game, "Error: expected the game instance to exist after construction."),
+					() -> assertNotNull(game.getAlienMoves(), "Error: expected alien moves to be initialized."),
+					() -> assertTrue(game.getAlienMoves().isEmpty(), "Error: expected alien moves to start empty."),
+					() -> assertNotNull(game.getMyMoves(), "Error: expected my moves to be initialized."),
+					() -> assertTrue(game.getMyMoves().isEmpty(), "Error: expected my moves to start empty."),
+					() -> assertNotNull(game.getAlienFleet(), "Error: expected the alien fleet reference to be initialized."),
+					() -> assertNotSame(game.getMyFleet(), game.getAlienFleet(), "Error: expected my fleet and alien fleet to be different objects."),
+					() -> assertTrue(game.getAlienFleet().getShips().isEmpty(), "Error: expected the alien fleet to start empty."),
+					() -> assertEquals(0, game.getInvalidShots(), "Error: expected invalid shots to start at zero."),
+					() -> assertEquals(0, game.getRepeatedShots(), "Error: expected repeated shots to start at zero."),
+					() -> assertEquals(0, game.getHits(), "Error: expected hits to start at zero."),
+					() -> assertEquals(0, game.getSunkShips(), "Error: expected sunk ships to start at zero.")
+			);
 	}
 
 	@Test
@@ -110,6 +117,19 @@ class GameTest {
 		game.fireShots(positions);
 
 		assertEquals(1, game.getAlienMoves().size(), "Error: expected one alien move to be recorded after firing a burst.");
+	}
+
+	@Test
+	@DisplayName("fireShots rejects bursts that do not contain exactly three positions")
+	void fireShotsRejectsWrongBurstSize() {
+		IllegalArgumentException exception = assertThrows(
+				IllegalArgumentException.class,
+				() -> game.fireShots(List.of(new Position(2, 3), new Position(2, 4))),
+				"Error: expected fireShots to reject bursts with fewer than three positions."
+		);
+
+		assertTrue(exception.getMessage().contains("exactly 3"),
+				"Error: expected the burst-size validation message to mention the required three shots.");
 	}
 
 	@Test
@@ -199,6 +219,27 @@ class GameTest {
 		String boardOutput = captureStdout(() -> Game.printBoard(fleet, List.of(), false, false));
 
 		assertFalse(boardOutput.contains(Messages.get("board.legend.title")), "Error: expected the legend title not to be printed when showLegend is false.");
+	}
+
+	@Test
+	@DisplayName("printAlienBoard renders the alien fleet with the player's recorded shots")
+	void printAlienBoardRendersAlienFleetAndMyMoves() {
+		assertTrue(game.getAlienFleet().addShip(new Barge(Compass.NORTH, new Position(0, 0))),
+				"Error: expected the alien-fleet fixture to be added successfully.");
+		game.getMyMoves().add(new Move(
+				1,
+				List.of(new Position(0, 0), new Position(1, 1), new Position(-1, 0)),
+				List.of()
+		));
+
+		String boardOutput = captureStdout(() -> game.printAlienBoard(true, false));
+
+		assertAll(
+				() -> assertTrue(boardOutput.contains("*"), "Error: expected printAlienBoard to mark a direct hit on the alien fleet."),
+				() -> assertTrue(boardOutput.contains("o"), "Error: expected printAlienBoard to mark a water shot on the alien board."),
+				() -> assertFalse(boardOutput.contains(Messages.get("board.legend.title")), "Error: expected printAlienBoard not to print the legend when show_legend is false."),
+				() -> assertTrue(boardOutput.contains(" A |"), "Error: expected printAlienBoard to render the classic row labels.")
+		);
 	}
 
 	@Test
@@ -383,6 +424,7 @@ class GameTest {
 		}
 
 		new File(DB_FILE).delete();
+		new File(DB_TRACE_FILE).delete();
 	}
 
 	private String captureStdout(Runnable action) {

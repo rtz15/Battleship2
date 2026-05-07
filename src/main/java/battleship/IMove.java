@@ -5,11 +5,7 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- * IMove
- *
- * @author Your Name
- * Date: 26/02/2026
- * Time: 18:32
+ * Represents one burst of shots and the resolved results associated with it.
  */
 public interface IMove {
 	static Move readMove(int moveNumber, Scanner sc) {
