@@ -402,16 +402,24 @@ public class Game implements IGame
 	}
 
 	private List<IPosition> collectUsableEnemyTargets() {
-		Set<IPosition> usablePositions = new HashSet<>();
+		Set<IPosition> blockedPositions = collectBlockedEnemyTargets();
+		List<IPosition> usablePositions = new ArrayList<>();
 		for (int row = 0; row < BOARD_SIZE; row++) {
 			for (int col = 0; col < BOARD_SIZE; col++) {
-				usablePositions.add(new Position(row, col));
+				IPosition candidate = new Position(row, col);
+				if (!blockedPositions.contains(candidate)) {
+					usablePositions.add(candidate);
+				}
 			}
 		}
+		return usablePositions;
+	}
 
-		this.myFleet.getSunkShips().forEach(ship -> usablePositions.removeAll(ship.getAdjacentPositions()));
-		this.alienMoves.forEach(move -> usablePositions.removeAll(move.getShots()));
-		return new ArrayList<>(usablePositions);
+	private Set<IPosition> collectBlockedEnemyTargets() {
+		Set<IPosition> blockedPositions = new HashSet<>();
+		this.myFleet.getSunkShips().forEach(ship -> blockedPositions.addAll(ship.getAdjacentPositions()));
+		this.alienMoves.forEach(move -> blockedPositions.addAll(move.getShots()));
+		return blockedPositions;
 	}
 
 	private static void validateBurstSize(List<IPosition> shots) {
