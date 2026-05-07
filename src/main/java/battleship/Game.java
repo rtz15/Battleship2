@@ -11,7 +11,17 @@ import java.util.*;
 
 public class Game implements IGame
 {
+	/**
+	 * Board dimension used by the simulator.
+	 */
+	public static final int BOARD_SIZE = 10;
+	/**
+	 * Number of shots that compose one burst.
+	 */
+	public static final int NUMBER_SHOTS = 3;
+
 	private static final String GAME_OVER_MESSAGE = "Maldito sejas, Java Sparrow, eu voltarei, glub glub glub ...";
+	private static final ObjectMapper JSON_MAPPER = createIndentedObjectMapper();
 
 	/**
 	 * Prints the game board by representing the positions of ships, adjacent tiles,
@@ -32,66 +42,13 @@ public class Game implements IGame
 		assert fleet != null;
 		assert moves != null;
 
-		char[][] map = new char[BOARD_SIZE][BOARD_SIZE];
-
-		for (int r = 0; r < BOARD_SIZE; r++)
-			for (int c = 0; c < BOARD_SIZE; c++)
-				map[r][c] = EMPTY_MARKER;
-
-		for (IShip ship : fleet.getShips()) {
-			for (IPosition ship_pos : ship.getPositions())
-				map[ship_pos.getRow()][ship_pos.getColumn()] = SHIP_MARKER;
-			if (!ship.stillFloating())
-				for (IPosition adjacent_pos : ship.getAdjacentPositions())
-					map[adjacent_pos.getRow()][adjacent_pos.getColumn()] = SHIP_ADJACENT_MARKER;
+		char[][] map = createEmptyBoard();
+		paintFleet(map, fleet);
+		if (show_shots) {
+			paintShots(map, moves);
 		}
 
-		if (show_shots)
-			for (IMove move : moves)
-				for (IPosition shot : move.getShots()) {
-					if (shot.isInside()){
-						int row = shot.getRow();
-						int col = shot.getColumn();
-						if (map[row][col] == SHIP_MARKER)
-							map[row][col] = SHOT_SHIP_MARKER;
-						if (map[row][col] == EMPTY_MARKER || map[row][col] == SHIP_ADJACENT_MARKER)
-							map[row][col] = SHOT_WATER_MARKER;
-					}
-				}
-
-		System.out.println();
-		System.out.print("    ");
-		for (int col = 0; col < BOARD_SIZE; col++) {
-			System.out.print(" " + (col + 1));
-		}
-		System.out.println();
-
-		System.out.print("   +-");
-		for (int col = 0; col < BOARD_SIZE; col++) {
-			System.out.print("--");
-		}
-		System.out.println("+");
-
-		for (int row = 0; row < BOARD_SIZE; row++) {
-			Position pos = new Position(row, 0);
-			char rowLabel = pos.getClassicRow();
-			System.out.print(" " + rowLabel + " |");
-			for (int col = 0; col < BOARD_SIZE; col++)
-				System.out.print(" " + map[row][col]);
-			System.out.println(" |");
-		}
-
-		System.out.print("   +");
-		for (int col = 0; col < BOARD_SIZE; col++)
-			System.out.print("--");
-		System.out.println("-+");
-
-		if (showLegend) {
-			System.out.println(Messages.get("board.legend.title"));
-			System.out.println(Messages.format("board.legend.line1", SHIP_MARKER, SHIP_ADJACENT_MARKER, EMPTY_MARKER));
-			System.out.println(Messages.format("board.legend.line2", SHOT_SHIP_MARKER, SHOT_WATER_MARKER));
-		}
-		System.out.println();
+		printBoardFrame(map, showLegend);
 	}
 
 	/**
@@ -107,41 +64,10 @@ public class Game implements IGame
 	 * @throws RuntimeException if an error occurs during JSON serialization.
 	 */
 	public static String jsonShots(List<IPosition> shots) {
-
 		assert shots != null;
 
-		// Serializar os tiros gerados em JSON usando a biblioteca Jackson
-		ObjectMapper objectMapper = new ObjectMapper();
-		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-
-		// 1. Create a simplified list containing only the desired data
-		List<Map<String, Object>> simplifiedShots = new ArrayList<>();
-		for (IPosition shot : shots) {
-			Map<String, Object> simplePos = new LinkedHashMap<>();
-			// We use getClassicRow() and getClassicColumn() based on your current JSON output
-			simplePos.put("row", String.valueOf(shot.getClassicRow()));
-			simplePos.put("column", shot.getClassicColumn());
-			simplifiedShots.add(simplePos);
-		}
-
-		String jsonString = null;
-		try {
-			// 2. Serialize the simplified list instead of the raw 'shots' list
-			jsonString = objectMapper.writeValueAsString(simplifiedShots);
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException("Erro ao serializar o JSON", e);
-		}
-
-//		System.out.println(jsonString);
-//		System.out.println();
-
-		// Retornar o JSON
-		return jsonString;
+		return toJson(toClassicShotMaps(shots), "Erro ao serializar o JSON");
 	}
-
-	//------------------------------------------------------------------
-	public static final int BOARD_SIZE = 10;
-	public static final int NUMBER_SHOTS = 3;
 
 	private static final char EMPTY_MARKER = '.';
 	private static final char SHIP_MARKER = '#';
@@ -168,8 +94,8 @@ public class Game implements IGame
 	{
 		this.moveNumber = 1;
 
-		this.alienMoves = new ArrayList<IMove>();
-		this.myMoves = new ArrayList<IMove>();
+		this.alienMoves = new ArrayList<>();
+		this.myMoves = new ArrayList<>();
 
 		this.alienFleet = new Fleet();
 		this.myFleet = myFleet;
@@ -196,7 +122,7 @@ public class Game implements IGame
 	@Override
 	public IFleet getAlienFleet()
 	{
-		return myFleet;
+		return alienFleet;
 	}
 
 	@Override
@@ -218,44 +144,8 @@ public class Game implements IGame
 
 		// Criar uma instância de Random com uma seed baseada no timestamp atual
 		Random random = new Random(System.currentTimeMillis());
-
-		Set<IPosition> usablePositions = new HashSet<IPosition>();
-		for (int r = 0; r < BOARD_SIZE; r++)
-			for (int c = 0; c < BOARD_SIZE; c++)
-				usablePositions.add(new Position(r, c));
-
-		this.myFleet.getSunkShips().forEach(ship -> usablePositions.removeAll(ship.getAdjacentPositions()));
-		this.alienMoves.forEach(move ->  usablePositions.removeAll(move.getShots()));
-
-		List<IPosition> candidateShots = new ArrayList<>(usablePositions);
-
-		// Criar lista para armazenar os tiros
-		List<IPosition> shots = new ArrayList<IPosition>();
-
-		System.out.println();
-		// Gerar coordenadas únicas até atingir o número definido por NUMBER_SHOTS
-
-		IPosition newShot = null;
-		if (candidateShots.size() >= Game.NUMBER_SHOTS)
-			while (shots.size() < Game.NUMBER_SHOTS) {
-				newShot = candidateShots.get(random.nextInt(candidateShots.size()));
-				if (!shots.contains(newShot))
-					shots.add(newShot);
-			}
-		else {
-			while (shots.size() < candidateShots.size()) {
-				newShot = candidateShots.get(random.nextInt(candidateShots.size()));
-				if (!shots.contains(newShot))
-					shots.add(newShot);
-			}
-			while (shots.size() < Game.NUMBER_SHOTS)
-				shots.add(newShot);
-		}
-
-		System.out.print("rajada ");
-		for (IPosition shot : shots)
-			System.out.print(shot + " ");
-		System.out.println();
+		List<IPosition> shots = selectRandomShots(collectUsableEnemyTargets(), random);
+		printBurst(shots);
 
 		this.fireShots(shots);
 
@@ -285,23 +175,15 @@ public class Game implements IGame
 		// Criar lista para armazenar os tiros
 		List<IPosition> shots = new ArrayList<>();
 
-		Scanner inputScanner = new Scanner(input);
-		while (shots.size() < NUMBER_SHOTS && inputScanner.hasNext()) {
-			// Lê a próxima parte e constrói uma posição
-			String token = inputScanner.next();
+		try (Scanner inputScanner = new Scanner(input)) {
+			while (shots.size() < NUMBER_SHOTS && inputScanner.hasNext()) {
+				String token = inputScanner.next();
 
-			if (token.matches("[A-Za-z]")) {
-				// Caso seja somente uma coluna ("A", "B", etc.), esperar o próximo número
-				if (inputScanner.hasNextInt()) {
-					int row = inputScanner.nextInt();
-					shots.add(new Position(token.toUpperCase().charAt(0), row));
+				if (token.matches("[A-Za-z]")) {
+					shots.add(readSeparatedShot(token, inputScanner));
 				} else {
-					throw new IllegalArgumentException("Posição incompleta! A coluna '" + token + "' não é seguida por uma linha.");
+					shots.add(readCompactShot(token));
 				}
-			} else {
-				// Caso o token já contenha a coluna e a linha juntas (ex.: "A3")
-				Scanner singleScanner = new Scanner(token);
-				shots.add(Tasks.readClassicPosition(singleScanner));
 			}
 		}
 
@@ -330,16 +212,8 @@ public class Game implements IGame
 	{
 		assert shots != null;
 
-		List<ShotResult> shotResults = new ArrayList<ShotResult>();
-		if (shots.size() != NUMBER_SHOTS) {
-			throw new IllegalArgumentException("Must fire exactly " + NUMBER_SHOTS + " shots per move.");
-		}
-
-		List<IPosition> alreadyShot = new ArrayList<IPosition>();
-		for (IPosition pos : shots) {
-			shotResults.add(fireSingleShot(pos, alreadyShot.contains(pos)));
-			alreadyShot.add(pos);
-		}
+		validateBurstSize(shots);
+		List<ShotResult> shotResults = resolveShotResults(shots);
 
 		Move move = new Move(moveNumber, shots, shotResults);
 
@@ -446,41 +320,20 @@ public class Game implements IGame
 		List<MoveSummary> moveSummaries = this.alienMoves.stream()
 				.map(this::buildMoveSummary)
 				.toList();
-		int totalShots = this.alienMoves.stream()
-				.mapToInt(move -> move.getShots().size())
-				.sum();
-		int totalMissedShots = moveSummaries.stream()
-				.mapToInt(MoveSummary::missedShots)
-				.sum();
-
-		List<String> fleetStatus = new ArrayList<>();
-		List<IShip> orderedShips = new ArrayList<>(this.myFleet.getShips());
-		orderedShips.sort(Comparator
-				.comparing(IShip::getCategory)
-				.thenComparing(ship -> ship.getPosition().toString()));
-
-		for (IShip ship : orderedShips) {
-			String status = ship.stillFloating() ? "A flutuar" : "Afundado";
-			fleetStatus.add(ship.getCategory() + " @ " + ship.getPosition() + " - " + status);
-		}
-
-		String finalResult = this.getRemainingShips() == 0
-				? "Todos os navios do jogador foram afundados"
-				: "A simulacao terminou com navios ainda a flutuar";
 
 		return new GameSummary(
 				"Resumo da simulacao Battleship",
-				finalResult,
+				resolveFinalResult(),
 				GAME_OVER_MESSAGE,
 				this.alienMoves.size(),
-				totalShots,
+				countTotalShots(),
 				this.countHits,
 				this.countRepeatedShots,
 				this.countInvalidShots,
-				totalMissedShots,
+				countTotalMissedShots(moveSummaries),
 				this.countSinks,
 				this.getRemainingShips(),
-				fleetStatus,
+				buildFleetStatus(),
 				moveSummaries
 		);
 	}
@@ -494,47 +347,17 @@ public class Game implements IGame
 	}
 
 	private MoveSummary buildMoveSummary(IMove move) {
-		int validShots = 0;
-		int repeatedShots = 0;
-		int outsideShots = 0;
-		int missedShots = 0;
-		int hits = 0;
-		int sunkShips = 0;
 		List<ShotSummary> shotSummaries = new ArrayList<>();
-
-		List<IPosition> shots = move.getShots();
-		List<ShotResult> results = move.getShotResults();
-
-		for (int index = 0; index < shots.size(); index++) {
-			IPosition shot = shots.get(index);
-			ShotResult result = results.get(index);
-
-			if (!result.valid()) {
-				outsideShots++;
-			} else if (result.repeated()) {
-				repeatedShots++;
-			} else if (result.ship() == null) {
-				validShots++;
-				missedShots++;
-			} else {
-				validShots++;
-				hits++;
-				if (result.sunk()) {
-					sunkShips++;
-				}
-			}
-
-			shotSummaries.add(new ShotSummary(shot.toString(), describeShotResult(result)));
-		}
+		MoveCounters counters = summarizeMoveResults(move, shotSummaries);
 
 		return new MoveSummary(
 				move.getNumber(),
-				validShots,
-				repeatedShots,
-				outsideShots,
-				missedShots,
-				hits,
-				sunkShips,
+				counters.validShots(),
+				counters.repeatedShots(),
+				counters.outsideShots(),
+				counters.missedShots(),
+				counters.hits(),
+				counters.sunkShips(),
 				shotSummaries
 		);
 	}
@@ -553,6 +376,290 @@ public class Game implements IGame
 			return "Afundou " + result.ship().getCategory();
 		}
 		return "Acertou " + result.ship().getCategory();
+	}
+
+	private static ObjectMapper createIndentedObjectMapper() {
+		return new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+	}
+
+	private static List<Map<String, Object>> toClassicShotMaps(List<IPosition> shots) {
+		List<Map<String, Object>> simplifiedShots = new ArrayList<>();
+		for (IPosition shot : shots) {
+			Map<String, Object> simplePos = new LinkedHashMap<>();
+			simplePos.put("row", String.valueOf(shot.getClassicRow()));
+			simplePos.put("column", shot.getClassicColumn());
+			simplifiedShots.add(simplePos);
+		}
+		return simplifiedShots;
+	}
+
+	private static String toJson(Object value, String errorMessage) {
+		try {
+			return JSON_MAPPER.writeValueAsString(value);
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(errorMessage, e);
+		}
+	}
+
+	private List<IPosition> collectUsableEnemyTargets() {
+		Set<IPosition> usablePositions = new HashSet<>();
+		for (int row = 0; row < BOARD_SIZE; row++) {
+			for (int col = 0; col < BOARD_SIZE; col++) {
+				usablePositions.add(new Position(row, col));
+			}
+		}
+
+		this.myFleet.getSunkShips().forEach(ship -> usablePositions.removeAll(ship.getAdjacentPositions()));
+		this.alienMoves.forEach(move -> usablePositions.removeAll(move.getShots()));
+		return new ArrayList<>(usablePositions);
+	}
+
+	private static void validateBurstSize(List<IPosition> shots) {
+		if (shots.size() != NUMBER_SHOTS) {
+			throw new IllegalArgumentException("Must fire exactly " + NUMBER_SHOTS + " shots per move.");
+		}
+	}
+
+	private List<ShotResult> resolveShotResults(List<IPosition> shots) {
+		List<ShotResult> shotResults = new ArrayList<>();
+		Set<IPosition> shotsInBurst = new HashSet<>();
+		for (IPosition position : shots) {
+			shotResults.add(fireSingleShot(position, shotsInBurst.contains(position)));
+			shotsInBurst.add(position);
+		}
+		return shotResults;
+	}
+
+	private MoveCounters summarizeMoveResults(IMove move, List<ShotSummary> shotSummaries) {
+		MoveCounters counters = MoveCounters.empty();
+		List<IPosition> shots = move.getShots();
+		List<ShotResult> results = move.getShotResults();
+
+		for (int index = 0; index < shots.size(); index++) {
+			IPosition shot = shots.get(index);
+			ShotResult result = results.get(index);
+			counters = counters.record(result);
+			shotSummaries.add(new ShotSummary(shot.toString(), describeShotResult(result)));
+		}
+
+		return counters;
+	}
+
+	private static List<IPosition> selectRandomShots(List<IPosition> candidateShots, Random random) {
+		List<IPosition> shots = new ArrayList<>();
+		IPosition fallbackShot = null;
+
+		if (candidateShots.size() >= Game.NUMBER_SHOTS) {
+			while (shots.size() < Game.NUMBER_SHOTS) {
+				IPosition candidate = candidateShots.get(random.nextInt(candidateShots.size()));
+				if (!shots.contains(candidate))
+					shots.add(candidate);
+			}
+			return shots;
+		}
+
+		while (shots.size() < candidateShots.size()) {
+			IPosition candidate = candidateShots.get(random.nextInt(candidateShots.size()));
+			if (!shots.contains(candidate)) {
+				shots.add(candidate);
+				fallbackShot = candidate;
+			}
+		}
+
+		while (shots.size() < Game.NUMBER_SHOTS)
+			shots.add(fallbackShot);
+
+		return shots;
+	}
+
+	private static char[][] createEmptyBoard() {
+		char[][] map = new char[BOARD_SIZE][BOARD_SIZE];
+		for (int row = 0; row < BOARD_SIZE; row++) {
+			Arrays.fill(map[row], EMPTY_MARKER);
+		}
+		return map;
+	}
+
+	private static void paintFleet(char[][] map, IFleet fleet) {
+		for (IShip ship : fleet.getShips()) {
+			paintShip(map, ship);
+			paintSunkAdjacency(map, ship);
+		}
+	}
+
+	private static void paintShip(char[][] map, IShip ship) {
+		for (IPosition shipPosition : ship.getPositions()) {
+			map[shipPosition.getRow()][shipPosition.getColumn()] = SHIP_MARKER;
+		}
+	}
+
+	private static void paintSunkAdjacency(char[][] map, IShip ship) {
+		if (!ship.stillFloating()) {
+			for (IPosition adjacentPosition : ship.getAdjacentPositions()) {
+				map[adjacentPosition.getRow()][adjacentPosition.getColumn()] = SHIP_ADJACENT_MARKER;
+			}
+		}
+	}
+
+	private static void paintShots(char[][] map, List<IMove> moves) {
+		for (IMove move : moves) {
+			for (IPosition shot : move.getShots()) {
+				paintShot(map, shot);
+			}
+		}
+	}
+
+	private static void paintShot(char[][] map, IPosition shot) {
+		if (!shot.isInside()) {
+			return;
+		}
+
+		int row = shot.getRow();
+		int col = shot.getColumn();
+		if (map[row][col] == SHIP_MARKER) {
+			map[row][col] = SHOT_SHIP_MARKER;
+		}
+		if (map[row][col] == EMPTY_MARKER || map[row][col] == SHIP_ADJACENT_MARKER) {
+			map[row][col] = SHOT_WATER_MARKER;
+		}
+	}
+
+	private static void printBoardFrame(char[][] map, boolean showLegend) {
+		System.out.println();
+		printColumnHeader();
+		printTopBorder();
+		printRows(map);
+		printBottomBorder();
+		if (showLegend) {
+			printLegend();
+		}
+		System.out.println();
+	}
+
+	private static void printColumnHeader() {
+		System.out.print("    ");
+		for (int col = 0; col < BOARD_SIZE; col++) {
+			System.out.print(" " + (col + 1));
+		}
+		System.out.println();
+	}
+
+	private static void printTopBorder() {
+		System.out.print("   +-");
+		for (int col = 0; col < BOARD_SIZE; col++) {
+			System.out.print("--");
+		}
+		System.out.println("+");
+	}
+
+	private static void printRows(char[][] map) {
+		for (int row = 0; row < BOARD_SIZE; row++) {
+			Position pos = new Position(row, 0);
+			char rowLabel = pos.getClassicRow();
+			System.out.print(" " + rowLabel + " |");
+			for (int col = 0; col < BOARD_SIZE; col++) {
+				System.out.print(" " + map[row][col]);
+			}
+			System.out.println(" |");
+		}
+	}
+
+	private static void printBottomBorder() {
+		System.out.print("   +");
+		for (int col = 0; col < BOARD_SIZE; col++) {
+			System.out.print("--");
+		}
+		System.out.println("-+");
+	}
+
+	private static void printLegend() {
+		System.out.println(Messages.get("board.legend.title"));
+		System.out.println(Messages.format("board.legend.line1", SHIP_MARKER, SHIP_ADJACENT_MARKER, EMPTY_MARKER));
+		System.out.println(Messages.format("board.legend.line2", SHOT_SHIP_MARKER, SHOT_WATER_MARKER));
+	}
+
+	private static void printBurst(List<IPosition> shots) {
+		System.out.println();
+		System.out.print("rajada ");
+		for (IPosition shot : shots)
+			System.out.print(shot + " ");
+		System.out.println();
+	}
+
+	private static IPosition readSeparatedShot(String token, Scanner inputScanner) {
+		if (!inputScanner.hasNextInt()) {
+			throw new IllegalArgumentException("Posição incompleta! A coluna '" + token + "' não é seguida por uma linha.");
+		}
+		int row = inputScanner.nextInt();
+		return new Position(token.toUpperCase().charAt(0), row);
+	}
+
+	private static IPosition readCompactShot(String token) {
+		try (Scanner singleScanner = new Scanner(token)) {
+			return Tasks.readClassicPosition(singleScanner);
+		}
+	}
+
+	private int countTotalShots() {
+		return this.alienMoves.stream()
+				.mapToInt(move -> move.getShots().size())
+				.sum();
+	}
+
+	private static int countTotalMissedShots(List<MoveSummary> moveSummaries) {
+		return moveSummaries.stream()
+				.mapToInt(MoveSummary::missedShots)
+				.sum();
+	}
+
+	private List<String> buildFleetStatus() {
+		List<String> fleetStatus = new ArrayList<>();
+		List<IShip> orderedShips = new ArrayList<>(this.myFleet.getShips());
+		orderedShips.sort(Comparator
+				.comparing(IShip::getCategory)
+				.thenComparing(ship -> ship.getPosition().toString()));
+
+		for (IShip ship : orderedShips) {
+			String status = ship.stillFloating() ? "A flutuar" : "Afundado";
+			fleetStatus.add(ship.getCategory() + " @ " + ship.getPosition() + " - " + status);
+		}
+
+		return fleetStatus;
+	}
+
+	private String resolveFinalResult() {
+		return this.getRemainingShips() == 0
+				? "Todos os navios do jogador foram afundados"
+				: "A simulacao terminou com navios ainda a flutuar";
+	}
+
+	private record MoveCounters(
+			int validShots,
+			int repeatedShots,
+			int outsideShots,
+			int missedShots,
+			int hits,
+			int sunkShips
+	) {
+		private static MoveCounters empty() {
+			return new MoveCounters(0, 0, 0, 0, 0, 0);
+		}
+
+		private MoveCounters record(ShotResult result) {
+			if (!result.valid()) {
+				return new MoveCounters(validShots, repeatedShots, outsideShots + 1, missedShots, hits, sunkShips);
+			}
+			if (result.repeated()) {
+				return new MoveCounters(validShots, repeatedShots + 1, outsideShots, missedShots, hits, sunkShips);
+			}
+			if (result.ship() == null) {
+				return new MoveCounters(validShots + 1, repeatedShots, outsideShots, missedShots + 1, hits, sunkShips);
+			}
+			if (result.sunk()) {
+				return new MoveCounters(validShots + 1, repeatedShots, outsideShots, missedShots, hits + 1, sunkShips + 1);
+			}
+			return new MoveCounters(validShots + 1, repeatedShots, outsideShots, missedShots, hits + 1, sunkShips);
+		}
 	}
 
 	public void over() {
