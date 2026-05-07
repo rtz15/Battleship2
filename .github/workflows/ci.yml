@@ -20,5 +20,5 @@ jobs:
           distribution: "temurin"
           cache: maven
 
-      - name: Build, test, package, and generate Javadoc
+      - name: Build, test, generate coverage, package, and generate Javadoc
         run: mvn -B clean verify javadoc:javadoc --file pom.xml
