@@ -20,8 +20,8 @@ This file records the refactoring candidates identified after the Ficha 4 testin
 | R4 | Vasco | `Tasks` | Break `menu()` into command handlers | The command loop concentrates many responsibilities and is the most complex CLI method in the project | - | Pending |
 | R5 | Eduardo | `Game` | Extract summary-building helpers from `createSummary()` and `buildMoveSummary()` | Summary generation is correct but dense, which makes future changes harder to isolate | - | Done on `Refactoring_110894` |
 | R6 | Eduardo | `PdfExporter` | Consolidate repetitive PDF line-writing steps into small section helpers | The exporter is stable but still writes every section procedurally in a single method | - | Done on `Refactoring_110894` |
-| R7 | Tiago | `Messages` / `AppLanguage` | Extract and centralize default-language resolution paths | Language fallback logic is simple but duplicated conceptually across localization entry points | - | Pending |
-| R8 | Tiago | `LanguageSupport` / `Main` | Isolate CLI language parsing from application startup | Entry-point concerns and language resolution can be made more explicit and easier to test | - | Pending |
+| R7 | Tiago | `Messages` / `AppLanguage` | Extract and centralize default-language resolution paths | Language fallback logic is simple but duplicated conceptually across localization entry points | `#36` | Done on `Refactoring_123026` |
+| R8 | Tiago | `LanguageSupport` / `Main` | Isolate CLI language parsing from application startup | Entry-point concerns and language resolution can be made more explicit and easier to test | `#37` | Done on `Refactoring_123026` |
 | R9 | Vasco | `Tasks` | Extract history-printing and fleet-loading helpers from the CLI loop | `menu()` still mixes input orchestration with printing and persistence concerns | - | Pending |
 | R10 | Eduardo | `Move` | Split verbose text construction from JSON response construction | `processEnemyFire()` currently handles counting, message construction and serialization in one method | - | Done on `Refactoring_110894` |
 
