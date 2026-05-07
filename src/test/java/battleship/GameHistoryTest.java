@@ -1,19 +1,27 @@
 package battleship;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.Filter;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.appender.AbstractAppender;
+import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.config.LoggerConfig;
+import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -35,20 +43,19 @@ class GameHistoryTest {
 	private static final String DB_FILE = "./battleship_history.mv.db";
 	private static final String DB_TRACE_FILE = "./battleship_history.trace.db";
 	private static final String DB_URL = "jdbc:h2:./battleship_history";
+	private static final String LOGGER_NAME = GameHistory.class.getName();
 
-	private final PrintStream originalErr = System.err;
-	private ByteArrayOutputStream errContent;
+	private TestLogAppender logAppender;
 
 	@BeforeEach
 	void setUp() {
-		errContent = new ByteArrayOutputStream();
-		System.setErr(new PrintStream(errContent, true, StandardCharsets.UTF_8));
+		logAppender = attachLogAppender();
 		cleanup();
 	}
 
 	@AfterEach
 	void tearDown() {
-		System.setErr(originalErr);
+		detachLogAppender(logAppender);
 		cleanup();
 	}
 
@@ -149,20 +156,20 @@ class GameHistoryTest {
 	}
 
 	@Test
-	@DisplayName("saveGame prints the SQL error when the backing table is missing")
-	void saveGamePrintsSQLExceptionWhenTableIsMissing() throws Exception {
+	@DisplayName("saveGame logs the SQL error when the backing table is missing")
+	void saveGameLogsSQLExceptionWhenTableIsMissing() throws Exception {
 		GameHistory gameHistory = new GameHistory();
 		dropHistoryTable();
 
 		gameHistory.saveGame(Timestamp.valueOf("2026-05-06 15:00:00"), 1, 1, 1, 10, "WIN");
 
-		assertTrue(stderr().contains("JdbcSQLSyntaxErrorException"),
-				"Error: expected saveGame() to print the observable SQL exception to stderr.");
+		assertLoggedError("Unable to save game history entry.",
+				"Error: expected saveGame() to log the observable SQL failure.");
 	}
 
 	@Test
-	@DisplayName("getHistory returns an empty list and prints the SQL error when the table is missing")
-	void getHistoryReturnsEmptyAndPrintsSQLExceptionWhenTableIsMissing() throws Exception {
+	@DisplayName("getHistory returns an empty list and logs the SQL error when the table is missing")
+	void getHistoryReturnsEmptyAndLogsSQLExceptionWhenTableIsMissing() throws Exception {
 		GameHistory gameHistory = new GameHistory();
 		dropHistoryTable();
 
@@ -171,8 +178,8 @@ class GameHistoryTest {
 		assertAll(
 				() -> assertTrue(history.isEmpty(),
 						"Error: expected getHistory() to return an empty list after a SQL failure."),
-				() -> assertTrue(stderr().contains("JdbcSQLSyntaxErrorException"),
-						"Error: expected getHistory() to print the observable SQL exception to stderr.")
+				() -> assertLoggedError("Unable to read game history.",
+						"Error: expected getHistory() to log the observable SQL failure.")
 		);
 	}
 
@@ -183,8 +190,12 @@ class GameHistoryTest {
 		}
 	}
 
-	private String stderr() {
-		return errContent.toString(StandardCharsets.UTF_8);
+	private void assertLoggedError(String expectedMessage, String assertionMessage) {
+		boolean found = logAppender.events().stream()
+				.anyMatch(event -> event.getLevel().equals(Level.ERROR)
+						&& event.getMessage().getFormattedMessage().equals(expectedMessage)
+						&& event.getThrown() instanceof SQLException);
+		assertTrue(found, assertionMessage);
 	}
 
 	private void cleanup() {
@@ -197,5 +208,43 @@ class GameHistoryTest {
 
 		new File(DB_FILE).delete();
 		new File(DB_TRACE_FILE).delete();
+	}
+
+	private TestLogAppender attachLogAppender() {
+		LoggerContext context = (LoggerContext) LogManager.getContext(false);
+		Configuration configuration = context.getConfiguration();
+		TestLogAppender appender = new TestLogAppender("GameHistoryTestAppender");
+		appender.start();
+		configuration.addAppender(appender);
+		LoggerConfig loggerConfig = new LoggerConfig(LOGGER_NAME, Level.ERROR, false);
+		loggerConfig.addAppender(appender, Level.ERROR, null);
+		configuration.addLogger(LOGGER_NAME, loggerConfig);
+		context.updateLoggers();
+		return appender;
+	}
+
+	private void detachLogAppender(Appender appender) {
+		LoggerContext context = (LoggerContext) LogManager.getContext(false);
+		Configuration configuration = context.getConfiguration();
+		configuration.removeLogger(LOGGER_NAME);
+		appender.stop();
+		context.updateLoggers();
+	}
+
+	private static final class TestLogAppender extends AbstractAppender {
+		private final List<LogEvent> events = new ArrayList<>();
+
+		private TestLogAppender(String name) {
+			super(name, (Filter) null, PatternLayout.createDefaultLayout(), false, null);
+		}
+
+		@Override
+		public void append(LogEvent event) {
+			events.add(event.toImmutable());
+		}
+
+		private List<LogEvent> events() {
+			return events;
+		}
 	}
 }
