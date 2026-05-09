@@ -28,7 +28,10 @@
 
 		<jackson.version>2.17.1</jackson.version>
 
-		<allure.version>2.31.0</allure.version>
+		<selenium.version>4.43.0</selenium.version>
+		<selenide.version>7.16.1</selenide.version>
+		<allure.version>2.34.0</allure.version>
+		<allure.maven.version>3.0.1</allure.maven.version>
 
 		<jetbrains.annotations.version>26.1.0</jetbrains.annotations.version>
 		<icu4j.version>78.1</icu4j.version>
@@ -57,6 +60,34 @@
 		<dependency>
 			<groupId>org.junit.platform</groupId>
 			<artifactId>junit-platform-launcher</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-java</artifactId>
+			<version>${selenium.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.codeborne</groupId>
+			<artifactId>selenide</artifactId>
+			<version>${selenide.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>io.qameta.allure</groupId>
+			<artifactId>allure-junit5</artifactId>
+			<version>${allure.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>io.qameta.allure</groupId>
+			<artifactId>allure-selenide</artifactId>
+			<version>${allure.version}</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -144,6 +175,7 @@
 				<configuration>
 					<includes>
 						<include>**/*Test.java</include>
+						<include>**/*Test*.java</include>
 					</includes>
 				</configuration>
 			</plugin>
@@ -165,6 +197,11 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>io.qameta.allure</groupId>
+				<artifactId>allure-maven</artifactId>
+				<version>${allure.maven.version}</version>
 			</plugin>
 		</plugins>
 	</build>

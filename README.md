@@ -99,6 +99,33 @@ The workflow in [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on e
 mvn -B clean verify javadoc:javadoc --file pom.xml
 ```
 
+## Ficha 5 acceptance testing
+
+Target web application:
+- https://papergames.io/en/battleship
+
+### Product Backlog
+
+1. Como visitante, quero ver as opcoes principais de entrada no jogo para escolher entre jogar com um amigo, jogar contra o robot, criar um torneio ou jogar online.
+2. Como visitante, quero consultar as regras do jogo antes de iniciar uma partida para perceber o objetivo, os turnos, os acertos e as falhas.
+3. Como visitante, quero consultar a explicacao das armas disponiveis para perceber as diferencas entre misseis simples, grandes, chuva de misseis e missil nuclear.
+4. Como jogador, quero criar um nickname antes de entrar numa partida para ser identificado no jogo.
+5. Como jogador, quero iniciar uma partida contra um robot para poder jogar sem depender de outro jogador.
+6. Como jogador, quero ver o estado inicial da partida depois de entrar no jogo para confirmar que tenho os meus barcos e que posso atacar o adversario.
+7. Como jogador, quero criar ou usar um link de convite para jogar com outro colega.
+8. Como jogador, quero consultar rankings ou leaderboards para comparar resultados com outros jogadores.
+9. Como jogador, quero aceder a torneios para organizar ou participar em competicoes.
+10. Como jogador, quero poder abandonar uma partida iniciada quando nao pretendo continuar.
+
+Ficha 5 suites:
+- `onboarding-robot-game`: Eduardo `110894`
+- `shared-link-game`: Vasco `111331`
+- `gameplay-rules`: Tiago `123026`
+
+A suite do Eduardo cobre as quatro primeiras user stories com duas implementacoes:
+- testes Selenium WebDriver diretos em `ficha5.eduardo.selenium`
+- testes Selenide + Allure em `ficha5.eduardo`
+
 ## Project artifacts
 
 - Code metrics: [CodeMetrics/README.md](CodeMetrics/README.md)
