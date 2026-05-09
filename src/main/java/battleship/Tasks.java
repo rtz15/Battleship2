@@ -29,88 +29,32 @@ public class Tasks {
 	private static final String STATUS = "estado";
 	private static final String SIMULA = "simula";
 	private static final String HISTORICO = "historico";
+	private static final String HISTORY_HEADER = "======================= HISTORICO DE JOGOS =======================";
+	private static final String HISTORY_FOOTER = "===============================================================";
+	private static final String[][] HELP_LINES = {
+			{GERAFROTA, "menu.description.gerafrota"},
+			{LEFROTA, "menu.description.lefrota"},
+			{STATUS, "menu.description.estado"},
+			{MAPA, "menu.description.mapa"},
+			{RAJADA, "menu.description.rajada"},
+			{SIMULA, "menu.description.simula"},
+			{TIROS, "menu.description.tiros"},
+			{HISTORICO, "menu.description.historico"},
+			{DESISTIR, "menu.description.desisto"}
+	};
 
 	/**
 	 * This task also tests the fighting element of a round of three shots.
 	 */
 	public static void menu() {
-		IFleet myFleet = null;
-		IGame game = null;
+		MenuState state = new MenuState();
 		menuHelp();
 
 		System.out.print("> ");
 		Scanner in = new Scanner(System.in);
 		String command = in.next();
 		while (!command.equals(DESISTIR)) {
-			switch (command) {
-				case GERAFROTA:
-					myFleet = Fleet.createRandom();
-					game = new Game(myFleet);
-					game.printMyBoard(false, true);
-					break;
-				case LEFROTA:
-					myFleet = buildFleet(in);
-					game = new Game(myFleet);
-					game.printMyBoard(false, true);
-					break;
-				case STATUS:
-					if (myFleet != null)
-						myFleet.printStatus();
-					break;
-				case MAPA:
-					if (myFleet != null)
-						game.printMyBoard(false, true);
-					break;
-				case RAJADA:
-					if (game != null) {
-						game.readEnemyFire(in);
-						myFleet.printStatus();
-						game.printMyBoard(true, false);
-
-						if (game.getRemainingShips() == 0) {
-							game.over();
-							System.exit(0);
-						}
-					}
-					break;
-				case SIMULA:
-					if (game != null) {
-						while (game.getRemainingShips() > 0) {
-							game.randomEnemyFire();
-							myFleet.printStatus();
-							game.printMyBoard(true, false);
-							try {
-								Thread.sleep(3000);
-							} catch (InterruptedException e) {
-								Thread.currentThread().interrupt();
-							}
-						}
-
-						if (game.getRemainingShips() == 0) {
-							game.over();
-							System.exit(0);
-						}
-					}
-					break;
-				case TIROS:
-					if (game != null)
-						game.printMyBoard(true, true);
-					break;
-				case HISTORICO:
-					GameHistory gameHistory = new GameHistory();
-					List<String> history = gameHistory.getHistory();
-					System.out.println("======================= HISTORICO DE JOGOS =======================");
-					for (String entry : history) {
-						System.out.println(entry);
-					}
-					System.out.println("===============================================================");
-					break;
-				case AJUDA:
-					menuHelp();
-					break;
-				default:
-					System.out.println(Messages.get("menu.unknown"));
-			}
+			handleCommand(command, in, state);
 			System.out.print("> ");
 			command = in.next();
 		}
@@ -123,15 +67,9 @@ public class Tasks {
 	public static void menuHelp() {
 		System.out.println(Messages.get("menu.help.header"));
 		System.out.println(Messages.get("menu.help.instructions"));
-		printHelpLine(GERAFROTA, "menu.description.gerafrota");
-		printHelpLine(LEFROTA, "menu.description.lefrota");
-		printHelpLine(STATUS, "menu.description.estado");
-		printHelpLine(MAPA, "menu.description.mapa");
-		printHelpLine(RAJADA, "menu.description.rajada");
-		printHelpLine(SIMULA, "menu.description.simula");
-		printHelpLine(TIROS, "menu.description.tiros");
-		printHelpLine(HISTORICO, "menu.description.historico");
-		printHelpLine(DESISTIR, "menu.description.desisto");
+		for (String[] helpLine : HELP_LINES) {
+			printHelpLine(helpLine[0], helpLine[1]);
+		}
 		System.out.println(Messages.get("menu.help.footer"));
 	}
 
@@ -149,20 +87,14 @@ public class Tasks {
 		assert in != null;
 
 		Fleet fleet = new Fleet();
-		int i = 0;
-		while (i < Fleet.FLEET_SIZE) {
-			IShip s = readShip(in);
-			if (s != null) {
-				boolean success = fleet.addShip(s);
-				if (success)
-					i++;
-				else
-					LOGGER.info("Falha na criacao de {} {} {}", s.getCategory(), s.getBearing(), s.getPosition());
-			} else {
-				LOGGER.info("Navio desconhecido!");
+		int addedShips = 0;
+		while (addedShips < Fleet.FLEET_SIZE) {
+			IShip ship = readShip(in);
+			if (addShipIfPossible(fleet, ship)) {
+				addedShips++;
 			}
 		}
-		LOGGER.info("{} navios adicionados com sucesso!", i);
+		LOGGER.info("{} navios adicionados com sucesso!", addedShips);
 		return fleet;
 	}
 
@@ -229,5 +161,126 @@ public class Tasks {
 		}
 
 		throw new IllegalArgumentException(Messages.get("position.invalid"));
+	}
+
+	private static void handleCommand(String command, Scanner in, MenuState state) {
+		switch (command) {
+			case GERAFROTA:
+				loadFleet(Fleet.createRandom(), state);
+				break;
+			case LEFROTA:
+				loadFleet(buildFleet(in), state);
+				break;
+			case STATUS:
+				printFleetStatus(state);
+				break;
+			case MAPA:
+				printFleetMap(state);
+				break;
+			case RAJADA:
+				processBurst(in, state);
+				break;
+			case SIMULA:
+				simulateGame(state);
+				break;
+			case TIROS:
+				printShots(state);
+				break;
+			case HISTORICO:
+				printHistory(new GameHistory());
+				break;
+			case AJUDA:
+				menuHelp();
+				break;
+			default:
+				System.out.println(Messages.get("menu.unknown"));
+		}
+	}
+
+	private static void loadFleet(IFleet fleet, MenuState state) {
+		state.myFleet = fleet;
+		state.game = new Game(fleet);
+		state.game.printMyBoard(false, true);
+	}
+
+	private static void printFleetStatus(MenuState state) {
+		if (state.myFleet != null) {
+			state.myFleet.printStatus();
+		}
+	}
+
+	private static void printFleetMap(MenuState state) {
+		if (state.game != null) {
+			state.game.printMyBoard(false, true);
+		}
+	}
+
+	private static void processBurst(Scanner in, MenuState state) {
+		if (state.game != null) {
+			state.game.readEnemyFire(in);
+			state.myFleet.printStatus();
+			state.game.printMyBoard(true, false);
+			exitIfGameOver(state.game);
+		}
+	}
+
+	private static void simulateGame(MenuState state) {
+		if (state.game != null) {
+			while (state.game.getRemainingShips() > 0) {
+				state.game.randomEnemyFire();
+				state.myFleet.printStatus();
+				state.game.printMyBoard(true, false);
+				pauseSimulation();
+			}
+			exitIfGameOver(state.game);
+		}
+	}
+
+	private static void printShots(MenuState state) {
+		if (state.game != null) {
+			state.game.printMyBoard(true, true);
+		}
+	}
+
+	private static void printHistory(GameHistory gameHistory) {
+		List<String> history = gameHistory.getHistory();
+		System.out.println(HISTORY_HEADER);
+		for (String entry : history) {
+			System.out.println(entry);
+		}
+		System.out.println(HISTORY_FOOTER);
+	}
+
+	private static boolean addShipIfPossible(Fleet fleet, IShip ship) {
+		if (ship == null) {
+			LOGGER.info("Navio desconhecido!");
+			return false;
+		}
+
+		boolean success = fleet.addShip(ship);
+		if (!success) {
+			LOGGER.info("Falha na criacao de {} {} {}", ship.getCategory(), ship.getBearing(), ship.getPosition());
+		}
+		return success;
+	}
+
+	private static void pauseSimulation() {
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
+	}
+
+	private static void exitIfGameOver(IGame game) {
+		if (game.getRemainingShips() == 0) {
+			game.over();
+			System.exit(0);
+		}
+	}
+
+	private static final class MenuState {
+		private IFleet myFleet;
+		private IGame game;
 	}
 }
