@@ -1,8 +1,10 @@
 package ficha5.eduardo.pages;
 
-import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 
+import java.time.Duration;
+
+import static com.codeborne.selenide.Condition.disappear;
 import static com.codeborne.selenide.Condition.enabled;
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
@@ -53,6 +55,7 @@ public class PaperGamesBattleshipPage {
 	}
 
 	public PaperGamesBattleshipPage startRobotGame() {
+		rejectConsentDialogIfVisible();
 		buttonContaining("Play vs robot").click();
 		nicknameInput().shouldBe(visible);
 		return this;
@@ -70,6 +73,7 @@ public class PaperGamesBattleshipPage {
 
 	public PaperGamesBattleshipPage chooseNickname(String nickname) {
 		nicknameInput().setValue(nickname);
+		rejectConsentDialogIfVisible();
 		buttonContaining("Continue").click();
 		rejectConsentDialogIfVisible();
 		return this;
@@ -100,9 +104,12 @@ public class PaperGamesBattleshipPage {
 	}
 
 	private void rejectConsentDialogIfVisible() {
-		ElementsCollection rejectButtons = $$("button").filterBy(text("Do not consent"));
-		if (!rejectButtons.isEmpty() && rejectButtons.first().isDisplayed()) {
-			rejectButtons.first().click();
+		SelenideElement rejectButton = $$("button").findBy(text("Do not consent"));
+		try {
+			rejectButton.shouldBe(visible, Duration.ofSeconds(5)).click();
+			rejectButton.should(disappear, Duration.ofSeconds(5));
+		} catch (AssertionError ignored) {
+			// The consent dialog is asynchronous and is not always shown.
 		}
 	}
 }
