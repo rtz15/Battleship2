@@ -8,6 +8,8 @@ import io.qameta.allure.selenide.AllureSelenide;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
+import static com.codeborne.selenide.Selenide.page;
+
 /**
  * Shared browser configuration for Eduardo's Ficha 5 acceptance tests.
  */
@@ -25,7 +27,7 @@ abstract class AcceptanceTestBase {
 		SelenideLogger.addListener("AllureSelenide", new AllureSelenide()
 				.screenshots(true)
 				.savePageSource(true));
-		battleshipPage = new PaperGamesBattleshipPage();
+		battleshipPage = page(PaperGamesBattleshipPage.class);
 	}
 
 	@AfterEach

@@ -35,7 +35,15 @@ public class PaperGamesBattleshipSeleniumPage {
 	}
 
 	public PaperGamesBattleshipSeleniumPage startRobotGame() {
-		clickButton("Play vs robot");
+		for (int attempt = 0; attempt < 2; attempt++) {
+			clickButton("Play vs robot");
+			try {
+				wait.until(ExpectedConditions.visibilityOfElementLocated(NICKNAME_INPUT));
+				return this;
+			} catch (TimeoutException ignored) {
+				rejectConsentDialogIfVisible();
+			}
+		}
 		wait.until(ExpectedConditions.visibilityOfElementLocated(NICKNAME_INPUT));
 		return this;
 	}

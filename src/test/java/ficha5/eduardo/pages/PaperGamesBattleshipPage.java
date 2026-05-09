@@ -56,7 +56,15 @@ public class PaperGamesBattleshipPage {
 
 	public PaperGamesBattleshipPage startRobotGame() {
 		rejectConsentDialogIfVisible();
-		buttonContaining("Play vs robot").click();
+		for (int attempt = 0; attempt < 2; attempt++) {
+			buttonContaining("Play vs robot").shouldBe(visible, enabled).click();
+			try {
+				nicknameInput().shouldBe(visible, Duration.ofSeconds(8));
+				return this;
+			} catch (AssertionError ignored) {
+				rejectConsentDialogIfVisible();
+			}
+		}
 		nicknameInput().shouldBe(visible);
 		return this;
 	}

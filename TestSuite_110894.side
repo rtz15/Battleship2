@@ -1,0 +1,236 @@
+{
+  "id": "1a84e5c4-8a58-4ab9-81a8-110894000001",
+  "version": "2.0",
+  "name": "TestSuite_110894",
+  "url": "https://papergames.io",
+  "tests": [{
+    "id": "1a84e5c4-8a58-4ab9-81a8-110894000101",
+    "name": "UserStoryTest1",
+    "commands": [{
+      "id": "1a84e5c4-8a58-4ab9-81a8-110894001001",
+      "comment": "Open the Battleship landing page.",
+      "command": "open",
+      "target": "/en/battleship",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "1a84e5c4-8a58-4ab9-81a8-110894001002",
+      "comment": "Use a stable desktop window size.",
+      "command": "setWindowSize",
+      "target": "1440x1000",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "1a84e5c4-8a58-4ab9-81a8-110894001003",
+      "comment": "Close the consent dialog if it is displayed.",
+      "command": "runScript",
+      "target": "const reject = Array.from(document.querySelectorAll('button')).find(button => button.textContent.includes('Do not consent')); if (reject) reject.click();",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "1a84e5c4-8a58-4ab9-81a8-110894001004",
+      "comment": "Validate that the Battleship page title is visible.",
+      "command": "assertElementPresent",
+      "target": "xpath=//*[contains(normalize-space(.),'Battleship Online')]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "1a84e5c4-8a58-4ab9-81a8-110894001005",
+      "comment": "Validate that the friend game option is visible.",
+      "command": "assertElementPresent",
+      "target": "xpath=//button[contains(normalize-space(.),'Play with a friend')]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "1a84e5c4-8a58-4ab9-81a8-110894001006",
+      "comment": "Validate that the robot game option is visible.",
+      "command": "assertElementPresent",
+      "target": "xpath=//button[contains(normalize-space(.),'Play vs robot')]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "1a84e5c4-8a58-4ab9-81a8-110894001007",
+      "comment": "Validate that the online random player option is visible.",
+      "command": "assertElementPresent",
+      "target": "xpath=//button[contains(normalize-space(.),'Play online')]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "1a84e5c4-8a58-4ab9-81a8-110894001008",
+      "comment": "Validate that the tournament entry option is visible.",
+      "command": "assertElementPresent",
+      "target": "xpath=//*[contains(normalize-space(.),'Create tournament')]",
+      "targets": [],
+      "value": ""
+    }]
+  }, {
+    "id": "1a84e5c4-8a58-4ab9-81a8-110894000102",
+    "name": "UserStoryTest2",
+    "commands": [{
+      "id": "1a84e5c4-8a58-4ab9-81a8-110894002001",
+      "comment": "Open the Battleship landing page.",
+      "command": "open",
+      "target": "/en/battleship",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "1a84e5c4-8a58-4ab9-81a8-110894002002",
+      "comment": "Close the consent dialog if it is displayed.",
+      "command": "runScript",
+      "target": "const reject = Array.from(document.querySelectorAll('button')).find(button => button.textContent.includes('Do not consent')); if (reject) reject.click();",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "1a84e5c4-8a58-4ab9-81a8-110894002003",
+      "comment": "Validate that the rules section is visible.",
+      "command": "assertElementPresent",
+      "target": "xpath=//*[contains(normalize-space(.),'Rules of Battleship game online')]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "1a84e5c4-8a58-4ab9-81a8-110894002004",
+      "comment": "Validate that the grid rule is visible.",
+      "command": "assertElementPresent",
+      "target": "xpath=//*[contains(normalize-space(.),'Each player has a 10x10 grid')]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "1a84e5c4-8a58-4ab9-81a8-110894002005",
+      "comment": "Validate that the weapons section is visible.",
+      "command": "assertElementPresent",
+      "target": "xpath=//*[contains(normalize-space(.),'Weapons')]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "1a84e5c4-8a58-4ab9-81a8-110894002006",
+      "comment": "Validate that the nuclear missile description is visible.",
+      "command": "assertElementPresent",
+      "target": "xpath=//*[contains(normalize-space(.),'Nuclear missile')]",
+      "targets": [],
+      "value": ""
+    }]
+  }, {
+    "id": "1a84e5c4-8a58-4ab9-81a8-110894000103",
+    "name": "UserStoryTest3",
+    "commands": [{
+      "id": "1a84e5c4-8a58-4ab9-81a8-110894003001",
+      "comment": "Open the Battleship landing page.",
+      "command": "open",
+      "target": "/en/battleship",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "1a84e5c4-8a58-4ab9-81a8-110894003002",
+      "comment": "Close the consent dialog if it is displayed.",
+      "command": "runScript",
+      "target": "const reject = Array.from(document.querySelectorAll('button')).find(button => button.textContent.includes('Do not consent')); if (reject) reject.click();",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "1a84e5c4-8a58-4ab9-81a8-110894003003",
+      "comment": "Start the robot game flow.",
+      "command": "click",
+      "target": "xpath=//button[contains(normalize-space(.),'Play vs robot')]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "1a84e5c4-8a58-4ab9-81a8-110894003004",
+      "comment": "Validate that the nickname prompt is displayed.",
+      "command": "assertElementPresent",
+      "target": "xpath=//*[contains(normalize-space(.),'Who are you?')]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "1a84e5c4-8a58-4ab9-81a8-110894003005",
+      "comment": "Validate that the nickname input is available.",
+      "command": "assertElementPresent",
+      "target": "css=input[placeholder='Nickname']",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "1a84e5c4-8a58-4ab9-81a8-110894003006",
+      "comment": "Validate that the continue button is displayed.",
+      "command": "assertElementPresent",
+      "target": "xpath=//button[contains(normalize-space(.),'Continue')]",
+      "targets": [],
+      "value": ""
+    }]
+  }, {
+    "id": "1a84e5c4-8a58-4ab9-81a8-110894000104",
+    "name": "UserStoryTest4",
+    "commands": [{
+      "id": "1a84e5c4-8a58-4ab9-81a8-110894004001",
+      "comment": "Open the Battleship landing page.",
+      "command": "open",
+      "target": "/en/battleship",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "1a84e5c4-8a58-4ab9-81a8-110894004002",
+      "comment": "Close the consent dialog if it is displayed.",
+      "command": "runScript",
+      "target": "const reject = Array.from(document.querySelectorAll('button')).find(button => button.textContent.includes('Do not consent')); if (reject) reject.click();",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "1a84e5c4-8a58-4ab9-81a8-110894004003",
+      "comment": "Start the robot game flow.",
+      "command": "click",
+      "target": "xpath=//button[contains(normalize-space(.),'Play vs robot')]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "1a84e5c4-8a58-4ab9-81a8-110894004004",
+      "comment": "Enter the player nickname.",
+      "command": "type",
+      "target": "css=input[placeholder='Nickname']",
+      "targets": [],
+      "value": "Eduardo110894"
+    }, {
+      "id": "1a84e5c4-8a58-4ab9-81a8-110894004005",
+      "comment": "Close the consent dialog again if it appears after typing.",
+      "command": "runScript",
+      "target": "const reject = Array.from(document.querySelectorAll('button')).find(button => button.textContent.includes('Do not consent')); if (reject) reject.click();",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "1a84e5c4-8a58-4ab9-81a8-110894004006",
+      "comment": "Submit the nickname.",
+      "command": "click",
+      "target": "xpath=//button[contains(normalize-space(.),'Continue')]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "1a84e5c4-8a58-4ab9-81a8-110894004007",
+      "comment": "Wait until the robot opponent is visible.",
+      "command": "waitForElementPresent",
+      "target": "xpath=//*[contains(normalize-space(.),'Paper Man')]",
+      "targets": [],
+      "value": "20000"
+    }, {
+      "id": "1a84e5c4-8a58-4ab9-81a8-110894004008",
+      "comment": "Validate that the player boats section is visible.",
+      "command": "assertElementPresent",
+      "target": "xpath=//*[contains(normalize-space(.),'Your boats')]",
+      "targets": [],
+      "value": ""
+    }]
+  }],
+  "suites": [{
+    "id": "1a84e5c4-8a58-4ab9-81a8-110894000201",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": [
+      "1a84e5c4-8a58-4ab9-81a8-110894000101",
+      "1a84e5c4-8a58-4ab9-81a8-110894000102",
+      "1a84e5c4-8a58-4ab9-81a8-110894000103",
+      "1a84e5c4-8a58-4ab9-81a8-110894000104"
+    ]
+  }],
+  "urls": [
+    "https://papergames.io/"
+  ],
+  "plugins": []
+}
