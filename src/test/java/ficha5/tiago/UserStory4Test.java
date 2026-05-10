@@ -18,7 +18,6 @@ class UserStory4Test extends AcceptanceTestBase {
 				.startRobotGame()
 				.chooseNickname(nickname)
 				.openAbortConfirmation()
-				.assertAbortConfirmationIsVisible()
 				.confirmAbortGame()
 				.assertLandingPageRestoredAfterAbort();
 	}

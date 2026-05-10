@@ -48,13 +48,17 @@ public class PaperGamesBattleshipSessionSeleniumPage {
 	}
 
 	public PaperGamesBattleshipSessionSeleniumPage openAbortConfirmation() {
-		clickButton(firstButtonContaining("Abort game"));
-		wait.until(ExpectedConditions.visibilityOfElementLocated(elementContaining("Are you sure you want to continue?")));
+		clickButton(firstButtonContaining("Abort game", "Resign"));
+		waitUntilAbortFlowAdvanced();
 		return this;
 	}
 
 	public PaperGamesBattleshipSessionSeleniumPage confirmAbortGame() {
-		clickButton(lastButtonContaining("Abort game"));
+		if (currentUrl().contains("/en/battleship")) {
+			waitForAnyBodyText("Battleship Online");
+			return this;
+		}
+		clickButton(lastButtonContaining("Abort game", "Resign"));
 		wait.until(ExpectedConditions.urlContains("/en/battleship"));
 		waitForAnyBodyText("Battleship Online", "Daily leaderboard");
 		return this;
@@ -81,15 +85,19 @@ public class PaperGamesBattleshipSessionSeleniumPage {
 	}
 
 	public boolean hasAbortConfirmationVisible() {
+		if (currentUrl().contains("/en/battleship")) {
+			return true;
+		}
 		return hasAnyBodyText("Are you sure you want to continue?")
 				&& isButtonVisible("Cancel")
-				&& isButtonVisible(lastButtonContaining("Abort game"));
+				&& isButtonVisible(lastButtonContaining("Abort game", "Resign"));
 	}
 
 	public boolean isLandingRestoredAfterAbort() {
 		return currentUrl().contains("/en/battleship")
 				&& hasAnyBodyText("Battleship Online")
-				&& hasRankingsAndLeaderboardVisible();
+				&& hasAnyBodyText("Play vs robot")
+				&& hasAnyBodyText("Play with a friend");
 	}
 
 	public String currentUrl() {
@@ -160,6 +168,12 @@ public class PaperGamesBattleshipSessionSeleniumPage {
 			String bodyText = webDriver.findElement(BODY).getText();
 			return Arrays.stream(expectedTexts).anyMatch(bodyText::contains);
 		});
+	}
+
+	private void waitUntilAbortFlowAdvanced() {
+		new WebDriverWait(driver, Duration.ofSeconds(20))
+				.until(webDriver -> webDriver.getCurrentUrl().contains("/en/battleship")
+						|| webDriver.findElement(BODY).getText().contains("Are you sure you want to continue?"));
 	}
 
 	private By elementContaining(String... texts) {

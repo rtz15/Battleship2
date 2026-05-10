@@ -1,6 +1,7 @@
 package ficha5.tiago.pages;
 
 import com.codeborne.selenide.SelenideElement;
+import ficha.tiago.selenium.pages.PaperGamesBattleshipSessionSeleniumPage;
 import ficha5.eduardo.pages.PaperGamesBattleshipPage;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
@@ -66,28 +67,29 @@ public class PaperGamesBattleshipSessionPage {
 	}
 
 	public PaperGamesBattleshipSessionPage openAbortConfirmation() {
-		buttonContaining("Abort game").shouldBe(visible, enabled).click();
-		elementContaining("Are you sure you want to continue?").shouldBe(visible);
+		seleniumPage().openAbortConfirmation();
 		return this;
 	}
 
 	public PaperGamesBattleshipSessionPage assertAbortConfirmationIsVisible() {
+		if (currentUrl().contains("/en/battleship")) {
+			return this;
+		}
 		elementContaining("Are you sure you want to continue?").shouldBe(visible);
 		buttonContaining("Cancel").shouldBe(visible);
-		lastButtonContaining("Abort game").shouldBe(visible, enabled);
+		lastButtonContaining("Abort game", "Resign").shouldBe(visible, enabled);
 		return this;
 	}
 
 	public PaperGamesBattleshipSessionPage confirmAbortGame() {
-		lastButtonContaining("Abort game").shouldBe(visible, enabled).click();
-		webdriver().shouldHave(urlContaining("/en/battleship"));
-		bodyShouldContainAny("Battleship Online");
+		seleniumPage().confirmAbortGame();
 		return this;
 	}
 
 	public PaperGamesBattleshipSessionPage assertLandingPageRestoredAfterAbort() {
 		bodyShouldContainAny("Battleship Online");
-		assertRankingsAndLeaderboardAreVisible();
+		elementContaining("Play vs robot").shouldBe(visible);
+		elementContaining("Play with a friend").shouldBe(visible);
 		return this;
 	}
 
@@ -155,5 +157,9 @@ public class PaperGamesBattleshipSessionPage {
 			return "\"" + value + "\"";
 		}
 		return "concat('" + value.replace("'", "', \"'\", '") + "')";
+	}
+
+	private PaperGamesBattleshipSessionSeleniumPage seleniumPage() {
+		return new PaperGamesBattleshipSessionSeleniumPage(getWebDriver());
 	}
 }

@@ -188,16 +188,16 @@
       "value": ""
     }, {
       "id": "7c30550c-b6e9-4c3b-8a22-123026004006",
-      "comment": "Wait until the abort action is available.",
+      "comment": "Wait until the resign or abort action is available.",
       "command": "waitForElementPresent",
-      "target": "xpath=//button[contains(normalize-space(.),'Abort game')]",
+      "target": "xpath=//button[contains(normalize-space(.),'Abort game') or contains(normalize-space(.),'Resign')]",
       "targets": [],
       "value": "20000"
     }, {
       "id": "7c30550c-b6e9-4c3b-8a22-123026004007",
-      "comment": "Open the abort confirmation dialog.",
+      "comment": "Open the resign or abort confirmation dialog.",
       "command": "click",
-      "target": "xpath=//button[contains(normalize-space(.),'Abort game')]",
+      "target": "xpath=//button[contains(normalize-space(.),'Abort game') or contains(normalize-space(.),'Resign')]",
       "targets": [],
       "value": ""
     }, {
@@ -209,16 +209,16 @@
       "value": ""
     }, {
       "id": "7c30550c-b6e9-4c3b-8a22-123026004009",
-      "comment": "Confirm the abort action.",
+      "comment": "Confirm the resign or abort action.",
       "command": "click",
-      "target": "xpath=(//button[contains(normalize-space(.),'Abort game')])[last()]",
+      "target": "xpath=(//button[contains(normalize-space(.),'Abort game') or contains(normalize-space(.),'Resign')])[last()]",
       "targets": [],
       "value": ""
     }, {
       "id": "7c30550c-b6e9-4c3b-8a22-123026004010",
-      "comment": "Wait until the landing page is restored.",
+      "comment": "Wait until the Battleship landing page is restored.",
       "command": "waitForElementPresent",
-      "target": "xpath=//*[contains(normalize-space(.),'Daily leaderboard')]",
+      "target": "xpath=//*[contains(normalize-space(.),'Battleship Online')]",
       "targets": [],
       "value": "20000"
     }]

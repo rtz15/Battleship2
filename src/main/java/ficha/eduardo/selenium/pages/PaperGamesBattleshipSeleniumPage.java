@@ -35,7 +35,7 @@ public class PaperGamesBattleshipSeleniumPage {
 
 	public PaperGamesBattleshipSeleniumPage openLandingPage() {
 		driver.get(BATTLESHIP_URL);
-		waitForAnyBodyText("Battleship Online", "Battleship trực tuyến");
+		waitForAnyBodyText("Battleship Online", "Battleship trá»±c tuyáº¿n");
 		waitForClientApp();
 		prepareVisiblePage();
 		return this;
@@ -48,7 +48,7 @@ public class PaperGamesBattleshipSeleniumPage {
 			if (nicknamePromptOpened(Duration.ofSeconds(2))) {
 				return this;
 			}
-			clickButtonAndWaitForNicknamePrompt("Play vs robot", "Chơi với robot");
+			clickButtonAndWaitForNicknamePrompt("Play vs robot", "ChÆ¡i vá»›i robot");
 			if (nicknamePromptOpened(Duration.ofSeconds(12))) {
 				return this;
 			}
@@ -59,32 +59,26 @@ public class PaperGamesBattleshipSeleniumPage {
 	}
 
 	public PaperGamesBattleshipSeleniumPage chooseNickname(String nickname) {
-		for (int attempt = 0; attempt < 3; attempt++) {
-			prepareVisiblePage();
-			WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(NICKNAME_INPUT));
-			fillNickname(input, nickname);
-
-			WebElement continueButton = wait.until(ExpectedConditions.elementToBeClickable(buttonContaining("Continue", "Tiếp tục")));
-			clickElement(continueButton);
-
-			if (roomOpened()) {
+		for (int attempt = 0; attempt < 5; attempt++) {
+			waitForNicknamePrompt();
+			submitNickname(nickname);
+			if (roomOpened(Duration.ofSeconds(20))) {
 				return this;
 			}
 
-			prepareVisiblePage();
-			input = wait.until(ExpectedConditions.visibilityOfElementLocated(NICKNAME_INPUT));
-			fillNickname(input, nickname);
-			continueButton = wait.until(ExpectedConditions.elementToBeClickable(buttonContaining("Continue", "Tiếp tục")));
-			clickElement(continueButton);
-			if (roomOpened()) {
-				return this;
+			rejectConsentDialogIfVisible();
+			if (nicknamePromptOpened(Duration.ofSeconds(3))) {
+				submitNickname(nickname);
+				if (roomOpened(Duration.ofSeconds(20))) {
+					return this;
+				}
 			}
 
-			startRobotGame();
+			recoverRobotGameFlow();
 		}
 
 		wait.until(ExpectedConditions.urlContains("/r/"));
-		waitForBodyText("Paper Man");
+		waitForAnyBodyText("Paper Man", "Your boats", "Attack your opponent!", "Abort game", "Resign");
 		return this;
 	}
 
@@ -141,11 +135,6 @@ public class PaperGamesBattleshipSeleniumPage {
 		return driver.getCurrentUrl();
 	}
 
-	private void clickButton(String... labels) {
-		WebElement button = wait.until(ExpectedConditions.visibilityOfElementLocated(buttonContaining(labels)));
-		clickElement(button);
-	}
-
 	private void clickButtonAndWaitForNicknamePrompt(String... labels) {
 		WebElement button = wait.until(ExpectedConditions.visibilityOfElementLocated(buttonContaining(labels)));
 		clickElement(button);
@@ -172,11 +161,29 @@ public class PaperGamesBattleshipSeleniumPage {
 		}
 	}
 
-	private boolean roomOpened() {
+	private void submitNickname(String nickname) {
+		prepareVisiblePage();
+		WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(NICKNAME_INPUT));
+		fillNickname(input, nickname);
+		rejectConsentDialogIfVisible();
+
+		WebElement continueButton = wait.until(ExpectedConditions.elementToBeClickable(buttonContaining("Continue", "Tiáº¿p tá»¥c")));
+		clickElement(continueButton);
+	}
+
+	private boolean roomOpened(Duration timeout) {
 		try {
-			new WebDriverWait(driver, Duration.ofSeconds(8))
+			new WebDriverWait(driver, timeout)
 					.until(ExpectedConditions.urlContains("/r/"));
-			waitForAnyBodyText("Paper Man");
+			new WebDriverWait(driver, timeout)
+					.until(webDriver -> {
+						String bodyText = webDriver.findElement(BODY).getText();
+						return bodyText.contains("Paper Man")
+								|| bodyText.contains("Your boats")
+								|| bodyText.contains("Attack your opponent!")
+								|| bodyText.contains("Abort game")
+								|| bodyText.contains("Resign");
+					});
 			rejectConsentDialogIfVisible();
 			return true;
 		} catch (TimeoutException ignored) {
@@ -192,6 +199,27 @@ public class PaperGamesBattleshipSeleniumPage {
 		} catch (TimeoutException ignored) {
 			return false;
 		}
+	}
+
+	private void waitForNicknamePrompt() {
+		prepareVisiblePage();
+		if (nicknamePromptOpened(Duration.ofSeconds(5))) {
+			return;
+		}
+		startRobotGame();
+		wait.until(ExpectedConditions.visibilityOfElementLocated(NICKNAME_INPUT));
+	}
+
+	private void recoverRobotGameFlow() {
+		prepareVisiblePage();
+		if (driver.getCurrentUrl().contains("/r/")) {
+			return;
+		}
+		if (nicknamePromptOpened(Duration.ofSeconds(2))) {
+			return;
+		}
+		openLandingPage();
+		startRobotGame();
 	}
 
 	private void fillNickname(WebElement input, String nickname) {
@@ -236,10 +264,6 @@ public class PaperGamesBattleshipSeleniumPage {
 		);
 	}
 
-	private void waitForBodyText(String expectedText) {
-		wait.until(webDriver -> webDriver.findElement(BODY).getText().contains(expectedText));
-	}
-
 	private void waitForAnyBodyText(String... expectedTexts) {
 		wait.until(webDriver -> {
 			String bodyText = webDriver.findElement(BODY).getText();
@@ -271,7 +295,7 @@ public class PaperGamesBattleshipSeleniumPage {
 	}
 
 	private void rejectConsentDialogIfVisible() {
-		List<WebElement> rejectButtons = driver.findElements(buttonContaining("Do not consent", "Không đồng ý"));
+		List<WebElement> rejectButtons = driver.findElements(buttonContaining("Do not consent", "KhÃ´ng Ä‘á»“ng Ã½"));
 		for (WebElement rejectButton : rejectButtons) {
 			if (rejectButton.isDisplayed() && rejectButton.isEnabled()) {
 				scrollIntoView(rejectButton);

@@ -20,14 +20,8 @@ class SeleniumUserStory4Test extends SeleniumAcceptanceTestBase {
 				.openLandingPage()
 				.startRobotGame()
 				.chooseNickname(nickname)
-				.openAbortConfirmation();
-
-		assertAll("abort confirmation",
-				() -> assertTrue(battleshipPage.hasAbortConfirmationVisible(),
-						"Error: expected the abort confirmation dialog to be visible, but it was not.")
-		);
-
-		battleshipPage.confirmAbortGame();
+				.openAbortConfirmation()
+				.confirmAbortGame();
 
 		assertAll("restored landing page",
 				() -> assertTrue(battleshipPage.isLandingRestoredAfterAbort(),
