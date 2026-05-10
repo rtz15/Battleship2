@@ -93,7 +93,7 @@ Versioned Ficha 4 reports committed to the repository:
 
 ## Continuous integration
 
-The workflow in [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on every `push` and on every `pull_request` targeting `main`. It provisions JDK 21 and executes:
+The workflow in [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on pushes to `main` and on every `pull_request` targeting `main`. It provisions JDK 21 and executes:
 
 ```bash
 mvn -B clean verify javadoc:javadoc --file pom.xml
@@ -122,7 +122,7 @@ Ficha 5 suites:
 - `shared-link-game`: Vasco `111331`
 - `gameplay-rules`: Tiago `123026`
 
-A suite do Eduardo cobre as quatro primeiras user stories com duas implementacoes:
+A suite do Eduardo cobre quatro cenarios de onboarding do backlog: entrada no jogo, consulta de regras/armas, nickname e inicio de partida contra robot. Existem duas implementacoes:
 - testes Selenium WebDriver diretos em `ficha5.eduardo.selenium`
 - testes Selenide + Allure em `ficha5.eduardo`
 
