@@ -126,6 +126,10 @@ A suite do Eduardo cobre quatro cenarios de onboarding do backlog: entrada no jo
 - testes Selenium WebDriver diretos em `ficha5.eduardo.selenium`
 - testes Selenide + Allure em `ficha5.eduardo`
 
+A suite do Vasco cobre quatro cenarios do fluxo `shared-link-game`: opcao para jogar com amigo, pedido de nickname, criacao da sala com URL `/r/` e presenca de sinais de convite/partilha. Existem duas implementacoes:
+- testes Selenium WebDriver diretos em `ficha5.vasco.selenium`
+- testes Selenide + Allure em `ficha5.vasco`
+
 A suite do Tiago cobre quatro cenarios focados no estado inicial da partida e nas areas de sessao visiveis na landing page: rankings, torneios, estado inicial contra robot e abandono de partida. Existem duas implementacoes:
 - testes Selenium WebDriver diretos em `ficha5.tiago.selenium`
 - testes Selenide + Allure em `ficha5.tiago`
