@@ -1,30 +1,27 @@
 package ficha.vasco.selenium.pages;
 
+import ficha.eduardo.selenium.pages.PaperGamesBattleshipSeleniumPage;
 import org.openqa.selenium.By;
-import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.NoSuchSessionException;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * Page object for Vasco's shared-link acceptance suite.
  */
 public class PaperGamesBattleshipSharedLinkSeleniumPage {
-	private static final String BATTLESHIP_URL = "https://papergames.io/en/battleship";
 	private static final By BODY = By.tagName("body");
 	private static final By NICKNAME_INPUT = By.cssSelector("input[formcontrolname='username'], input[placeholder='Nickname']");
+	private static final String ROOM_URL_FRAGMENT = "/r/";
+	private static final String JAVASCRIPT_CLICK = "arguments[0].click();";
 	private static final String[] SHARED_GAME_LABELS = {
 			"Play with a friend",
 			"Play with friend",
@@ -50,31 +47,16 @@ public class PaperGamesBattleshipSharedLinkSeleniumPage {
 
 	private final WebDriver driver;
 	private final WebDriverWait wait;
+	private final PaperGamesBattleshipSeleniumPage onboardingPage;
 
 	public PaperGamesBattleshipSharedLinkSeleniumPage(WebDriver driver) {
 		this.driver = driver;
 		this.wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+		this.onboardingPage = new PaperGamesBattleshipSeleniumPage(driver);
 	}
 
 	public PaperGamesBattleshipSharedLinkSeleniumPage openLandingPage() {
-		for (int attempt = 0; attempt < 3; attempt++) {
-			try {
-				driver.get(BATTLESHIP_URL);
-				waitForAnyBodyText("Battleship Online", "Battleship trực tuyến");
-				prepareVisiblePage();
-				return this;
-			} catch (TimeoutException timedOut) {
-				stopLoadingPage();
-				if (hasAnyBodyText("Battleship Online", "Battleship trực tuyến")) {
-					prepareVisiblePage();
-					return this;
-				}
-			} catch (NoSuchSessionException sessionClosed) {
-				throw sessionClosed;
-			}
-		}
-		waitForAnyBodyText("Battleship Online", "Battleship trực tuyến");
-		prepareVisiblePage();
+		onboardingPage.openLandingPage();
 		return this;
 	}
 
@@ -103,12 +85,12 @@ public class PaperGamesBattleshipSharedLinkSeleniumPage {
 			recoverSharedGameFlow();
 		}
 
-		wait.until(ExpectedConditions.urlContains("/r/"));
+		wait.until(ExpectedConditions.urlContains(ROOM_URL_FRAGMENT));
 		return this;
 	}
 
 	public boolean hasSharedPlayOptionVisible() {
-		return isButtonVisible(SHARED_GAME_LABELS);
+		return onboardingPage.isButtonVisible(SHARED_GAME_LABELS);
 	}
 
 	public boolean isNicknamePromptVisible() {
@@ -118,7 +100,7 @@ public class PaperGamesBattleshipSharedLinkSeleniumPage {
 	public boolean hasRoomUrl() {
 		try {
 			new WebDriverWait(driver, Duration.ofSeconds(20))
-					.until(ExpectedConditions.urlContains("/r/"));
+					.until(ExpectedConditions.urlContains(ROOM_URL_FRAGMENT));
 			return true;
 		} catch (TimeoutException ignored) {
 			return false;
@@ -130,36 +112,30 @@ public class PaperGamesBattleshipSharedLinkSeleniumPage {
 	}
 
 	public boolean hasWaitingOrShareStateVisible() {
-		return hasRoomUrl() && (hasInviteControlVisible() || hasAnyBodyText(SHARE_MARKERS));
+		return hasRoomUrl() && (hasInviteControlVisible() || onboardingPage.hasAnyBodyText(SHARE_MARKERS));
 	}
 
 	public String currentUrl() {
-		return driver.getCurrentUrl();
+		return onboardingPage.currentUrl();
 	}
 
 	private void clickButtonAndWaitForNicknamePrompt(String... labels) {
-		WebElement button = wait.until(ExpectedConditions.visibilityOfElementLocated(buttonContaining(labels)));
-		clickElement(button);
+		WebElement button = wait.until(ExpectedConditions.elementToBeClickable(buttonContaining(labels)));
+		clickWithFallback(button);
 		if (nicknamePromptOpened(Duration.ofSeconds(3))) {
 			return;
 		}
 
-		button = wait.until(ExpectedConditions.visibilityOfElementLocated(buttonContaining(labels)));
-		scrollIntoView(button);
-		((JavascriptExecutor) driver).executeScript("arguments[0].click();", button);
+		clickWithJavaScript(wait.until(ExpectedConditions.visibilityOfElementLocated(buttonContaining(labels))));
 	}
 
-	private void clickElement(WebElement element) {
-		scrollIntoView(element);
+	private void clickWithFallback(WebElement element) {
+		scrollToCenter(element);
 		try {
-			new Actions(driver)
-					.moveToElement(element)
-					.pause(Duration.ofMillis(150))
-					.click()
-					.perform();
-		} catch (ElementNotInteractableException | StaleElementReferenceException intercepted) {
+			element.click();
+		} catch (ElementNotInteractableException intercepted) {
 			prepareVisiblePage();
-			((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
+			clickWithJavaScript(element);
 		}
 	}
 
@@ -170,13 +146,13 @@ public class PaperGamesBattleshipSharedLinkSeleniumPage {
 		rejectConsentDialogIfVisible();
 
 		WebElement continueButton = wait.until(ExpectedConditions.elementToBeClickable(buttonContaining("Continue", "Tiếp tục")));
-		clickElement(continueButton);
+		clickWithFallback(continueButton);
 	}
 
 	private boolean sharedRoomReady(Duration timeout) {
 		try {
 			new WebDriverWait(driver, timeout)
-					.until(webDriver -> webDriver.getCurrentUrl().contains("/r/")
+					.until(webDriver -> webDriver.getCurrentUrl().contains(ROOM_URL_FRAGMENT)
 							|| bodyContainsAny(SHARE_MARKERS));
 			rejectConsentDialogIfVisible();
 			return true;
@@ -206,7 +182,7 @@ public class PaperGamesBattleshipSharedLinkSeleniumPage {
 
 	private void recoverSharedGameFlow() {
 		prepareVisiblePage();
-		if (driver.getCurrentUrl().contains("/r/")) {
+		if (driver.getCurrentUrl().contains(ROOM_URL_FRAGMENT)) {
 			return;
 		}
 		if (nicknamePromptOpened(Duration.ofSeconds(2))) {
@@ -217,18 +193,8 @@ public class PaperGamesBattleshipSharedLinkSeleniumPage {
 	}
 
 	private void fillNickname(WebElement input, String nickname) {
-		scrollIntoView(input);
-		try {
-			input.clear();
-			input.sendKeys(nickname);
-		} catch (ElementNotInteractableException ignored) {
-			setValueWithJavaScript(input, nickname);
-			return;
-		}
-
-		if (!nickname.equals(input.getAttribute("value"))) {
-			setValueWithJavaScript(input, nickname);
-		}
+		scrollToCenter(input);
+		setValueWithJavaScript(input, nickname);
 	}
 
 	private boolean hasInviteControlVisible() {
@@ -240,42 +206,13 @@ public class PaperGamesBattleshipSharedLinkSeleniumPage {
 		}
 	}
 
-	private boolean hasAnyBodyText(String... expectedTexts) {
-		try {
-			waitForAnyBodyText(expectedTexts);
-			return true;
-		} catch (TimeoutException ignored) {
-			return false;
-		}
-	}
-
 	private boolean bodyContainsAny(String... expectedTexts) {
 		String bodyText = driver.findElement(BODY).getText();
 		return Arrays.stream(expectedTexts).anyMatch(bodyText::contains);
 	}
 
-	private boolean isButtonVisible(String... labels) {
-		try {
-			WebElement button = wait.until(ExpectedConditions.visibilityOfElementLocated(buttonContaining(labels)));
-			return button.isDisplayed();
-		} catch (TimeoutException ignored) {
-			return false;
-		}
-	}
-
 	private void prepareVisiblePage() {
-		waitForClientApp();
 		hideExternalOverlaysIfVisible();
-	}
-
-	private void stopLoadingPage() {
-		try {
-			((JavascriptExecutor) driver).executeScript("window.stop();");
-		} catch (NoSuchSessionException ignored) {
-			throw ignored;
-		} catch (RuntimeException ignored) {
-			// If the renderer is still recovering, the following wait will decide whether the page is usable.
-		}
 	}
 
 	private void hideExternalOverlaysIfVisible() {
@@ -284,7 +221,7 @@ public class PaperGamesBattleshipSharedLinkSeleniumPage {
 						+ ".forEach(function(element) { element.remove(); });");
 	}
 
-	private void scrollIntoView(WebElement element) {
+	private void scrollToCenter(WebElement element) {
 		((JavascriptExecutor) driver).executeScript(
 				"arguments[0].scrollIntoView({block: 'center', inline: 'center'});", element);
 	}
@@ -301,23 +238,8 @@ public class PaperGamesBattleshipSharedLinkSeleniumPage {
 		);
 	}
 
-	private void waitForAnyBodyText(String... expectedTexts) {
-		wait.until(webDriver -> bodyContainsAny(expectedTexts));
-	}
-
-	private void waitForClientApp() {
-		wait.until(webDriver -> "complete".equals(((JavascriptExecutor) webDriver)
-				.executeScript("return document.readyState")));
-		try {
-			new WebDriverWait(driver, Duration.ofSeconds(5))
-					.until(webDriver -> Boolean.TRUE.equals(((JavascriptExecutor) webDriver).executeScript(
-							"if (!window.getAllAngularTestabilities) { return true; }"
-									+ "return window.getAllAngularTestabilities().every(function(testability) {"
-									+ "return testability.isStable();"
-									+ "});")));
-		} catch (TimeoutException ignored) {
-			// The live site keeps background polling active, so document readiness is the reliable signal here.
-		}
+	private void clickWithJavaScript(WebElement element) {
+		((JavascriptExecutor) driver).executeScript(JAVASCRIPT_CLICK, element);
 	}
 
 	private By buttonContaining(String... labels) {
@@ -326,29 +248,26 @@ public class PaperGamesBattleshipSharedLinkSeleniumPage {
 
 	private By inviteControl() {
 		return By.xpath("//*[self::a or self::button or self::input or self::textarea][" +
-				"contains(@href, '/r/') or contains(@value, '/r/') or contains(@placeholder, 'link') or "
+				"contains(@href, " + xpathLiteral(ROOM_URL_FRAGMENT) + ") or contains(@value, "
+				+ xpathLiteral(ROOM_URL_FRAGMENT) + ") or contains(@placeholder, 'link') or "
 				+ containsAnyNormalizedText(SHARE_MARKERS) + "]");
 	}
 
 	private void rejectConsentDialogIfVisible() {
-		List<WebElement> rejectButtons = driver.findElements(buttonContaining("Do not consent", "Không đồng ý"));
-		for (WebElement rejectButton : rejectButtons) {
-			if (rejectButton.isDisplayed() && rejectButton.isEnabled()) {
-				scrollIntoView(rejectButton);
-				try {
-					rejectButton.click();
-				} catch (ElementClickInterceptedException intercepted) {
-					((JavascriptExecutor) driver).executeScript("arguments[0].click();", rejectButton);
-				}
+		for (WebElement button : driver.findElements(buttonContaining("Do not consent", "Không đồng ý"))) {
+			if (button.isDisplayed() && button.isEnabled()) {
+				clickWithFallback(button);
 				return;
 			}
 		}
 	}
 
 	private String containsAnyNormalizedText(String... labels) {
-		return Arrays.stream(labels)
-				.map(label -> "contains(normalize-space(.), " + xpathLiteral(label) + ")")
-				.collect(Collectors.joining(" or "));
+		return Arrays.stream(labels).map(this::normalizedTextContains).collect(Collectors.joining(" or "));
+	}
+
+	private String normalizedTextContains(String label) {
+		return "contains(normalize-space(.), " + xpathLiteral(label) + ")";
 	}
 
 	private String xpathLiteral(String value) {
