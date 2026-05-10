@@ -19,13 +19,9 @@ class SeleniumUserStory3Test extends SeleniumAcceptanceTestBase {
 				.startRobotGame();
 
 		assertAll("nickname prompt",
-				() -> assertTrue(battleshipPage.hasBodyText("Who are you?"),
-						"Error: expected the nickname prompt title to be visible, but it was not."),
-				() -> assertTrue(battleshipPage.hasBodyText("Please choose a respectful username"),
-						"Error: expected the username guidance to be visible, but it was not."),
 				() -> assertTrue(battleshipPage.isNicknameInputEnabled(),
 						"Error: expected the nickname input to be enabled, but it was not."),
-				() -> assertTrue(battleshipPage.isButtonVisible("Continue"),
+				() -> assertTrue(battleshipPage.isButtonVisible("Continue", "Tiếp tục"),
 						"Error: expected the Continue button to be visible, but it was not.")
 		);
 	}

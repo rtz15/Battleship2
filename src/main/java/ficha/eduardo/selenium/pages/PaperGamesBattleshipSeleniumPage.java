@@ -13,7 +13,9 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Page object for the PaperGames Battleship page using direct Selenium WebDriver calls.
@@ -21,7 +23,7 @@ import java.util.List;
 public class PaperGamesBattleshipSeleniumPage {
 	private static final String BATTLESHIP_URL = "https://papergames.io/en/battleship";
 	private static final By BODY = By.tagName("body");
-	private static final By NICKNAME_INPUT = By.cssSelector("input[placeholder='Nickname']");
+	private static final By NICKNAME_INPUT = By.cssSelector("input[formcontrolname='username'], input[placeholder='Nickname']");
 
 	private final WebDriver driver;
 	private final WebDriverWait wait;
@@ -33,7 +35,7 @@ public class PaperGamesBattleshipSeleniumPage {
 
 	public PaperGamesBattleshipSeleniumPage openLandingPage() {
 		driver.get(BATTLESHIP_URL);
-		waitForBodyText("Battleship Online");
+		waitForAnyBodyText("Battleship Online", "Battleship trực tuyến");
 		waitForClientApp();
 		prepareVisiblePage();
 		return this;
@@ -46,7 +48,7 @@ public class PaperGamesBattleshipSeleniumPage {
 			if (nicknamePromptOpened(Duration.ofSeconds(2))) {
 				return this;
 			}
-			clickButtonAndWaitForNicknamePrompt("Play vs robot");
+			clickButtonAndWaitForNicknamePrompt("Play vs robot", "Chơi với robot");
 			if (nicknamePromptOpened(Duration.ofSeconds(12))) {
 				return this;
 			}
@@ -62,7 +64,7 @@ public class PaperGamesBattleshipSeleniumPage {
 			WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(NICKNAME_INPUT));
 			fillNickname(input, nickname);
 
-			WebElement continueButton = wait.until(ExpectedConditions.elementToBeClickable(buttonContaining("Continue")));
+			WebElement continueButton = wait.until(ExpectedConditions.elementToBeClickable(buttonContaining("Continue", "Tiếp tục")));
 			clickElement(continueButton);
 
 			if (roomOpened()) {
@@ -72,7 +74,7 @@ public class PaperGamesBattleshipSeleniumPage {
 			prepareVisiblePage();
 			input = wait.until(ExpectedConditions.visibilityOfElementLocated(NICKNAME_INPUT));
 			fillNickname(input, nickname);
-			continueButton = wait.until(ExpectedConditions.elementToBeClickable(buttonContaining("Continue")));
+			continueButton = wait.until(ExpectedConditions.elementToBeClickable(buttonContaining("Continue", "Tiếp tục")));
 			clickElement(continueButton);
 			if (roomOpened()) {
 				return this;
@@ -87,35 +89,39 @@ public class PaperGamesBattleshipSeleniumPage {
 	}
 
 	public boolean hasBodyText(String expectedText) {
+		return hasAnyBodyText(expectedText);
+	}
+
+	public boolean hasAnyBodyText(String... expectedTexts) {
 		try {
-			waitForBodyText(expectedText);
+			waitForAnyBodyText(expectedTexts);
 			return true;
 		} catch (TimeoutException ignored) {
 			return false;
 		}
 	}
 
-	public boolean isMainButtonAvailable(String label) {
+	public boolean isMainButtonAvailable(String... labels) {
 		try {
-			WebElement button = wait.until(ExpectedConditions.elementToBeClickable(buttonContaining(label)));
+			WebElement button = wait.until(ExpectedConditions.elementToBeClickable(buttonContaining(labels)));
 			return button.isDisplayed() && button.isEnabled();
 		} catch (TimeoutException ignored) {
 			return false;
 		}
 	}
 
-	public boolean isButtonVisible(String label) {
+	public boolean isButtonVisible(String... labels) {
 		try {
-			WebElement button = wait.until(ExpectedConditions.visibilityOfElementLocated(buttonContaining(label)));
+			WebElement button = wait.until(ExpectedConditions.visibilityOfElementLocated(buttonContaining(labels)));
 			return button.isDisplayed();
 		} catch (TimeoutException ignored) {
 			return false;
 		}
 	}
 
-	public boolean isTextVisible(String text) {
+	public boolean isTextVisible(String... texts) {
 		try {
-			WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(elementContaining(text)));
+			WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(elementContaining(texts)));
 			return element.isDisplayed();
 		} catch (TimeoutException ignored) {
 			return false;
@@ -135,19 +141,19 @@ public class PaperGamesBattleshipSeleniumPage {
 		return driver.getCurrentUrl();
 	}
 
-	private void clickButton(String label) {
-		WebElement button = wait.until(ExpectedConditions.visibilityOfElementLocated(buttonContaining(label)));
+	private void clickButton(String... labels) {
+		WebElement button = wait.until(ExpectedConditions.visibilityOfElementLocated(buttonContaining(labels)));
 		clickElement(button);
 	}
 
-	private void clickButtonAndWaitForNicknamePrompt(String label) {
-		WebElement button = wait.until(ExpectedConditions.visibilityOfElementLocated(buttonContaining(label)));
+	private void clickButtonAndWaitForNicknamePrompt(String... labels) {
+		WebElement button = wait.until(ExpectedConditions.visibilityOfElementLocated(buttonContaining(labels)));
 		clickElement(button);
 		if (nicknamePromptOpened(Duration.ofSeconds(3))) {
 			return;
 		}
 
-		button = wait.until(ExpectedConditions.visibilityOfElementLocated(buttonContaining(label)));
+		button = wait.until(ExpectedConditions.visibilityOfElementLocated(buttonContaining(labels)));
 		scrollIntoView(button);
 		((JavascriptExecutor) driver).executeScript("arguments[0].click();", button);
 	}
@@ -170,7 +176,7 @@ public class PaperGamesBattleshipSeleniumPage {
 		try {
 			new WebDriverWait(driver, Duration.ofSeconds(8))
 					.until(ExpectedConditions.urlContains("/r/"));
-			waitForBodyText("Paper Man");
+			waitForAnyBodyText("Paper Man");
 			rejectConsentDialogIfVisible();
 			return true;
 		} catch (TimeoutException ignored) {
@@ -204,16 +210,13 @@ public class PaperGamesBattleshipSeleniumPage {
 	}
 
 	private void prepareVisiblePage() {
-		rejectConsentDialogIfVisible();
 		hideExternalOverlaysIfVisible();
 	}
 
 	private void hideExternalOverlaysIfVisible() {
 		((JavascriptExecutor) driver).executeScript(
-				"document.querySelectorAll(\".fc-ab-root, .fc-dialog, .fc-dialog-overlay, .fc-consent-root, "
-						+ ".fc-whitelist-root, button.fc-faq-header, .fc-faq-header, "
-						+ ".fc-dialog-restricted-content, [aria-label='Learn more']\")"
-						+ ".forEach(function(element) { element.style.display='none'; element.style.pointerEvents='none'; });");
+				"document.querySelectorAll(\"[class^='fc-'], [class*=' fc-'], iframe[id^='googlefc']\")"
+						+ ".forEach(function(element) { element.remove(); });");
 	}
 
 	private void scrollIntoView(WebElement element) {
@@ -237,6 +240,13 @@ public class PaperGamesBattleshipSeleniumPage {
 		wait.until(webDriver -> webDriver.findElement(BODY).getText().contains(expectedText));
 	}
 
+	private void waitForAnyBodyText(String... expectedTexts) {
+		wait.until(webDriver -> {
+			String bodyText = webDriver.findElement(BODY).getText();
+			return Arrays.stream(expectedTexts).anyMatch(bodyText::contains);
+		});
+	}
+
 	private void waitForClientApp() {
 		wait.until(webDriver -> "complete".equals(((JavascriptExecutor) webDriver)
 				.executeScript("return document.readyState")));
@@ -252,16 +262,16 @@ public class PaperGamesBattleshipSeleniumPage {
 		}
 	}
 
-	private By buttonContaining(String label) {
-		return By.xpath("//button[contains(normalize-space(.), " + xpathLiteral(label) + ")]");
+	private By buttonContaining(String... labels) {
+		return By.xpath("//button[" + containsAnyNormalizedText(labels) + "]");
 	}
 
-	private By elementContaining(String text) {
-		return By.xpath("//*[contains(normalize-space(.), " + xpathLiteral(text) + ")]");
+	private By elementContaining(String... texts) {
+		return By.xpath("//*[" + containsAnyNormalizedText(texts) + "]");
 	}
 
 	private void rejectConsentDialogIfVisible() {
-		List<WebElement> rejectButtons = driver.findElements(buttonContaining("Do not consent"));
+		List<WebElement> rejectButtons = driver.findElements(buttonContaining("Do not consent", "Không đồng ý"));
 		for (WebElement rejectButton : rejectButtons) {
 			if (rejectButton.isDisplayed() && rejectButton.isEnabled()) {
 				scrollIntoView(rejectButton);
@@ -273,6 +283,12 @@ public class PaperGamesBattleshipSeleniumPage {
 				return;
 			}
 		}
+	}
+
+	private String containsAnyNormalizedText(String... labels) {
+		return Arrays.stream(labels)
+				.map(label -> "contains(normalize-space(.), " + xpathLiteral(label) + ")")
+				.collect(Collectors.joining(" or "));
 	}
 
 	private String xpathLiteral(String value) {

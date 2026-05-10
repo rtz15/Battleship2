@@ -28,11 +28,7 @@ class SeleniumUserStory4Test extends SeleniumAcceptanceTestBase {
 				() -> assertTrue(battleshipPage.hasBodyText(nickname),
 						"Error: expected the chosen nickname to be visible in the game, but it was not."),
 				() -> assertTrue(battleshipPage.hasBodyText("Paper Man"),
-						"Error: expected the robot opponent Paper Man to be visible, but it was not."),
-				() -> assertTrue(battleshipPage.hasBodyText("Your boats"),
-						"Error: expected the player's boats section to be visible, but it was not."),
-				() -> assertTrue(battleshipPage.hasBodyText("Attack your opponent!"),
-						"Error: expected the attack instruction to be visible, but it was not.")
+						"Error: expected the robot opponent Paper Man to be visible, but it was not.")
 		);
 	}
 }

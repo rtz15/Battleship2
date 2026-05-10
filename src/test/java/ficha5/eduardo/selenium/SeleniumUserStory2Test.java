@@ -17,13 +17,13 @@ class SeleniumUserStory2Test extends SeleniumAcceptanceTestBase {
 		battleshipPage.openLandingPage();
 
 		assertAll("rules and weapons",
-				() -> assertTrue(battleshipPage.hasBodyText("Rules of Battleship game online"),
+				() -> assertTrue(battleshipPage.hasAnyBodyText("Rules of Battleship game online", "Luật chơi"),
 						"Error: expected the rules section to be visible, but it was not."),
-				() -> assertTrue(battleshipPage.hasBodyText("Each player has a 10x10 grid"),
+				() -> assertTrue(battleshipPage.hasAnyBodyText("Each player has a 10x10 grid", "mạng lưới 10 × 10"),
 						"Error: expected the grid rule to be visible, but it was not."),
-				() -> assertTrue(battleshipPage.hasBodyText("Weapons"),
+				() -> assertTrue(battleshipPage.hasAnyBodyText("Weapons", "vũ khí"),
 						"Error: expected the weapons section to be visible, but it was not."),
-				() -> assertTrue(battleshipPage.hasBodyText("Nuclear missile"),
+				() -> assertTrue(battleshipPage.hasAnyBodyText("Nuclear missile", "bom nguyên tử"),
 						"Error: expected the nuclear missile description to be visible, but it was not.")
 		);
 	}
