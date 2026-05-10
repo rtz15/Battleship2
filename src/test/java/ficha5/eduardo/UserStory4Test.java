@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 /**
  * User story 4: as a player, I want to start a robot match after entering my nickname.
  */
-class UserStoryTest4 extends AcceptanceTestBase {
+class UserStory4Test extends AcceptanceTestBase {
 
 	@Test
 	@DisplayName("UserStoryTest4 - nickname submission starts a robot match")

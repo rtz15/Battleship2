@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * User story 2: as a visitor, I want to read the visible game rules before starting a match.
  */
-class UserStoryTest2 extends SeleniumAcceptanceTestBase {
+class SeleniumUserStory2Test extends SeleniumAcceptanceTestBase {
 
 	@Test
 	@DisplayName("Selenium UserStoryTest2 - landing page documents rules and weapons")

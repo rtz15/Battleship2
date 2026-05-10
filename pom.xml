@@ -36,6 +36,8 @@
 		<jetbrains.annotations.version>26.1.0</jetbrains.annotations.version>
 		<icu4j.version>78.1</icu4j.version>
 		<openpdf.version>3.0.3</openpdf.version>
+
+		<sonar.coverage.exclusions>src/main/java/ficha/eduardo/selenium/pages/**</sonar.coverage.exclusions>
 	</properties>
 
 	<dependencyManagement>

@@ -1,12 +1,14 @@
-package ficha5.eduardo.selenium.pages;
+package ficha.eduardo.selenium.pages;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -32,15 +34,20 @@ public class PaperGamesBattleshipSeleniumPage {
 	public PaperGamesBattleshipSeleniumPage openLandingPage() {
 		driver.get(BATTLESHIP_URL);
 		waitForBodyText("Battleship Online");
+		waitForClientApp();
 		prepareVisiblePage();
 		return this;
 	}
 
 	public PaperGamesBattleshipSeleniumPage startRobotGame() {
-		for (int attempt = 0; attempt < 3; attempt++) {
+		for (int attempt = 0; attempt < 4; attempt++) {
+			waitForClientApp();
 			prepareVisiblePage();
-			clickButton("Play vs robot");
-			if (nicknamePromptOpened()) {
+			if (nicknamePromptOpened(Duration.ofSeconds(2))) {
+				return this;
+			}
+			clickButtonAndWaitForNicknamePrompt("Play vs robot");
+			if (nicknamePromptOpened(Duration.ofSeconds(12))) {
 				return this;
 			}
 			prepareVisiblePage();
@@ -133,11 +140,27 @@ public class PaperGamesBattleshipSeleniumPage {
 		clickElement(button);
 	}
 
+	private void clickButtonAndWaitForNicknamePrompt(String label) {
+		WebElement button = wait.until(ExpectedConditions.visibilityOfElementLocated(buttonContaining(label)));
+		clickElement(button);
+		if (nicknamePromptOpened(Duration.ofSeconds(3))) {
+			return;
+		}
+
+		button = wait.until(ExpectedConditions.visibilityOfElementLocated(buttonContaining(label)));
+		scrollIntoView(button);
+		((JavascriptExecutor) driver).executeScript("arguments[0].click();", button);
+	}
+
 	private void clickElement(WebElement element) {
 		scrollIntoView(element);
 		try {
-			element.click();
-		} catch (ElementNotInteractableException intercepted) {
+			new Actions(driver)
+					.moveToElement(element)
+					.pause(Duration.ofMillis(150))
+					.click()
+					.perform();
+		} catch (ElementNotInteractableException | StaleElementReferenceException intercepted) {
 			prepareVisiblePage();
 			((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
 		}
@@ -155,9 +178,9 @@ public class PaperGamesBattleshipSeleniumPage {
 		}
 	}
 
-	private boolean nicknamePromptOpened() {
+	private boolean nicknamePromptOpened(Duration timeout) {
 		try {
-			new WebDriverWait(driver, Duration.ofSeconds(8))
+			new WebDriverWait(driver, timeout)
 					.until(ExpectedConditions.visibilityOfElementLocated(NICKNAME_INPUT));
 			return true;
 		} catch (TimeoutException ignored) {
@@ -182,12 +205,14 @@ public class PaperGamesBattleshipSeleniumPage {
 
 	private void prepareVisiblePage() {
 		rejectConsentDialogIfVisible();
-		hideFaqBubbleIfVisible();
+		hideExternalOverlaysIfVisible();
 	}
 
-	private void hideFaqBubbleIfVisible() {
+	private void hideExternalOverlaysIfVisible() {
 		((JavascriptExecutor) driver).executeScript(
-				"document.querySelectorAll(\"button.fc-faq-header, .fc-faq-header, .fc-dialog-restricted-content, [aria-label='Learn more']\")"
+				"document.querySelectorAll(\".fc-ab-root, .fc-dialog, .fc-dialog-overlay, .fc-consent-root, "
+						+ ".fc-whitelist-root, button.fc-faq-header, .fc-faq-header, "
+						+ ".fc-dialog-restricted-content, [aria-label='Learn more']\")"
 						+ ".forEach(function(element) { element.style.display='none'; element.style.pointerEvents='none'; });");
 	}
 
@@ -209,7 +234,22 @@ public class PaperGamesBattleshipSeleniumPage {
 	}
 
 	private void waitForBodyText(String expectedText) {
-		wait.until(driver -> driver.findElement(BODY).getText().contains(expectedText));
+		wait.until(webDriver -> webDriver.findElement(BODY).getText().contains(expectedText));
+	}
+
+	private void waitForClientApp() {
+		wait.until(webDriver -> "complete".equals(((JavascriptExecutor) webDriver)
+				.executeScript("return document.readyState")));
+		try {
+			new WebDriverWait(driver, Duration.ofSeconds(5))
+					.until(webDriver -> Boolean.TRUE.equals(((JavascriptExecutor) webDriver).executeScript(
+							"if (!window.getAllAngularTestabilities) { return true; }"
+									+ "return window.getAllAngularTestabilities().every(function(testability) {"
+									+ "return testability.isStable();"
+									+ "});")));
+		} catch (TimeoutException ignored) {
+			// The live site keeps background polling active, so document readiness is the reliable signal here.
+		}
 	}
 
 	private By buttonContaining(String label) {

@@ -1,6 +1,6 @@
 package ficha5.eduardo.selenium;
 
-import ficha5.eduardo.selenium.pages.PaperGamesBattleshipSeleniumPage;
+import ficha.eduardo.selenium.pages.PaperGamesBattleshipSeleniumPage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.WebDriver;
@@ -22,6 +22,10 @@ abstract class SeleniumAcceptanceTestBase {
 		options.addArguments("--headless=new");
 		options.addArguments("--window-size=1440,1000");
 		options.addArguments("--disable-gpu");
+		options.addArguments("--disable-dev-shm-usage");
+		options.addArguments("--disable-notifications");
+		options.addArguments("--no-sandbox");
+		options.addArguments("--lang=en-US");
 		driver = new ChromeDriver(options);
 		driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(60));
 		battleshipPage = new PaperGamesBattleshipSeleniumPage(driver);

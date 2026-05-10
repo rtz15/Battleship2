@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * User story 4: as a player, I want to start a robot match after entering my nickname.
  */
-class UserStoryTest4 extends SeleniumAcceptanceTestBase {
+class SeleniumUserStory4Test extends SeleniumAcceptanceTestBase {
 
 	@Test
 	@DisplayName("Selenium UserStoryTest4 - nickname submission starts a robot match")

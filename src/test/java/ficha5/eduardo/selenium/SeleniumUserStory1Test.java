@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * User story 1: as a visitor, I want to see the Battleship entry options before choosing a game mode.
  */
-class UserStoryTest1 extends SeleniumAcceptanceTestBase {
+class SeleniumUserStory1Test extends SeleniumAcceptanceTestBase {
 
 	@Test
 	@DisplayName("Selenium UserStoryTest1 - landing page exposes the available Battleship entry options")

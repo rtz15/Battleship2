@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * User story 3: as a player, I want to choose a nickname before entering a robot match.
  */
-class UserStoryTest3 extends SeleniumAcceptanceTestBase {
+class SeleniumUserStory3Test extends SeleniumAcceptanceTestBase {
 
 	@Test
 	@DisplayName("Selenium UserStoryTest3 - robot game asks for a nickname")
