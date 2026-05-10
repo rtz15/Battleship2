@@ -37,7 +37,7 @@
 		<icu4j.version>78.1</icu4j.version>
 		<openpdf.version>3.0.3</openpdf.version>
 
-		<sonar.coverage.exclusions>src/main/java/ficha/eduardo/selenium/pages/**</sonar.coverage.exclusions>
+		<sonar.coverage.exclusions>src/main/java/ficha/**/selenium/pages/**</sonar.coverage.exclusions>
 	</properties>
 
 	<dependencyManagement>

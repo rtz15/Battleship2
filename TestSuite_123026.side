@@ -1,0 +1,243 @@
+{
+  "id": "7c30550c-b6e9-4c3b-8a22-123026000001",
+  "version": "2.0",
+  "name": "TestSuite_123026",
+  "url": "https://papergames.io",
+  "tests": [{
+    "id": "7c30550c-b6e9-4c3b-8a22-123026000101",
+    "name": "UserStoryTest1",
+    "commands": [{
+      "id": "7c30550c-b6e9-4c3b-8a22-123026001001",
+      "comment": "Open the Battleship landing page.",
+      "command": "open",
+      "target": "/en/battleship",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "7c30550c-b6e9-4c3b-8a22-123026001002",
+      "comment": "Use a stable desktop window size.",
+      "command": "setWindowSize",
+      "target": "1440x1000",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "7c30550c-b6e9-4c3b-8a22-123026001003",
+      "comment": "Close the consent dialog if it is displayed.",
+      "command": "runScript",
+      "target": "const reject = Array.from(document.querySelectorAll('button')).find(button => button.textContent.includes('Do not consent')); if (reject) reject.click();",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "7c30550c-b6e9-4c3b-8a22-123026001004",
+      "comment": "Validate that the daily leaderboard section is visible.",
+      "command": "assertElementPresent",
+      "target": "xpath=//*[contains(normalize-space(.),'Daily leaderboard')]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "7c30550c-b6e9-4c3b-8a22-123026001005",
+      "comment": "Validate that the ranking area is visible.",
+      "command": "assertElementPresent",
+      "target": "xpath=//*[contains(normalize-space(.),'RANKA')]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "7c30550c-b6e9-4c3b-8a22-123026001006",
+      "comment": "Validate that the general ranking description is visible.",
+      "command": "assertElementPresent",
+      "target": "xpath=//*[contains(normalize-space(.),'General ranking since 30 days.')]",
+      "targets": [],
+      "value": ""
+    }]
+  }, {
+    "id": "7c30550c-b6e9-4c3b-8a22-123026000102",
+    "name": "UserStoryTest2",
+    "commands": [{
+      "id": "7c30550c-b6e9-4c3b-8a22-123026002001",
+      "comment": "Open the Battleship landing page.",
+      "command": "open",
+      "target": "/en/battleship",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "7c30550c-b6e9-4c3b-8a22-123026002002",
+      "comment": "Close the consent dialog if it is displayed.",
+      "command": "runScript",
+      "target": "const reject = Array.from(document.querySelectorAll('button')).find(button => button.textContent.includes('Do not consent')); if (reject) reject.click();",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "7c30550c-b6e9-4c3b-8a22-123026002003",
+      "comment": "Validate that the Create tournament link exists.",
+      "command": "assertElementPresent",
+      "target": "xpath=//a[contains(normalize-space(.),'Create tournament') and contains(@href,'/en/t/create-tournament')]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "7c30550c-b6e9-4c3b-8a22-123026002004",
+      "comment": "Validate that the My tournaments link exists.",
+      "command": "assertElementPresent",
+      "target": "xpath=//a[contains(normalize-space(.),'My tournaments') and contains(@href,'/en/t/my-tournaments')]",
+      "targets": [],
+      "value": ""
+    }]
+  }, {
+    "id": "7c30550c-b6e9-4c3b-8a22-123026000103",
+    "name": "UserStoryTest3",
+    "commands": [{
+      "id": "7c30550c-b6e9-4c3b-8a22-123026003001",
+      "comment": "Open the Battleship landing page.",
+      "command": "open",
+      "target": "/en/battleship",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "7c30550c-b6e9-4c3b-8a22-123026003002",
+      "comment": "Close the consent dialog if it is displayed.",
+      "command": "runScript",
+      "target": "const reject = Array.from(document.querySelectorAll('button')).find(button => button.textContent.includes('Do not consent')); if (reject) reject.click();",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "7c30550c-b6e9-4c3b-8a22-123026003003",
+      "comment": "Start the robot game flow.",
+      "command": "click",
+      "target": "xpath=//button[contains(normalize-space(.),'Play vs robot')]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "7c30550c-b6e9-4c3b-8a22-123026003004",
+      "comment": "Enter the player nickname.",
+      "command": "type",
+      "target": "css=input[placeholder='Nickname']",
+      "targets": [],
+      "value": "Tiago123026"
+    }, {
+      "id": "7c30550c-b6e9-4c3b-8a22-123026003005",
+      "comment": "Submit the nickname.",
+      "command": "click",
+      "target": "xpath=//button[contains(normalize-space(.),'Continue')]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "7c30550c-b6e9-4c3b-8a22-123026003006",
+      "comment": "Wait until the robot opponent is visible.",
+      "command": "waitForElementPresent",
+      "target": "xpath=//*[contains(normalize-space(.),'Paper Man')]",
+      "targets": [],
+      "value": "20000"
+    }, {
+      "id": "7c30550c-b6e9-4c3b-8a22-123026003007",
+      "comment": "Validate that the player boats section is visible.",
+      "command": "assertElementPresent",
+      "target": "xpath=//*[contains(normalize-space(.),'Your boats')]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "7c30550c-b6e9-4c3b-8a22-123026003008",
+      "comment": "Validate that the opponent boats section is visible.",
+      "command": "assertElementPresent",
+      "target": "xpath=//*[contains(normalize-space(.),\"Your opponent's boats\")]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "7c30550c-b6e9-4c3b-8a22-123026003009",
+      "comment": "Validate that the attack prompt is visible.",
+      "command": "assertElementPresent",
+      "target": "xpath=//*[contains(normalize-space(.),'Attack your opponent!')]",
+      "targets": [],
+      "value": ""
+    }]
+  }, {
+    "id": "7c30550c-b6e9-4c3b-8a22-123026000104",
+    "name": "UserStoryTest4",
+    "commands": [{
+      "id": "7c30550c-b6e9-4c3b-8a22-123026004001",
+      "comment": "Open the Battleship landing page.",
+      "command": "open",
+      "target": "/en/battleship",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "7c30550c-b6e9-4c3b-8a22-123026004002",
+      "comment": "Close the consent dialog if it is displayed.",
+      "command": "runScript",
+      "target": "const reject = Array.from(document.querySelectorAll('button')).find(button => button.textContent.includes('Do not consent')); if (reject) reject.click();",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "7c30550c-b6e9-4c3b-8a22-123026004003",
+      "comment": "Start the robot game flow.",
+      "command": "click",
+      "target": "xpath=//button[contains(normalize-space(.),'Play vs robot')]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "7c30550c-b6e9-4c3b-8a22-123026004004",
+      "comment": "Enter the player nickname.",
+      "command": "type",
+      "target": "css=input[placeholder='Nickname']",
+      "targets": [],
+      "value": "Tiago123026"
+    }, {
+      "id": "7c30550c-b6e9-4c3b-8a22-123026004005",
+      "comment": "Submit the nickname.",
+      "command": "click",
+      "target": "xpath=//button[contains(normalize-space(.),'Continue')]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "7c30550c-b6e9-4c3b-8a22-123026004006",
+      "comment": "Wait until the abort action is available.",
+      "command": "waitForElementPresent",
+      "target": "xpath=//button[contains(normalize-space(.),'Abort game')]",
+      "targets": [],
+      "value": "20000"
+    }, {
+      "id": "7c30550c-b6e9-4c3b-8a22-123026004007",
+      "comment": "Open the abort confirmation dialog.",
+      "command": "click",
+      "target": "xpath=//button[contains(normalize-space(.),'Abort game')]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "7c30550c-b6e9-4c3b-8a22-123026004008",
+      "comment": "Validate that the confirmation dialog is visible.",
+      "command": "assertElementPresent",
+      "target": "xpath=//*[contains(normalize-space(.),'Are you sure you want to continue?')]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "7c30550c-b6e9-4c3b-8a22-123026004009",
+      "comment": "Confirm the abort action.",
+      "command": "click",
+      "target": "xpath=(//button[contains(normalize-space(.),'Abort game')])[last()]",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "7c30550c-b6e9-4c3b-8a22-123026004010",
+      "comment": "Wait until the landing page is restored.",
+      "command": "waitForElementPresent",
+      "target": "xpath=//*[contains(normalize-space(.),'Daily leaderboard')]",
+      "targets": [],
+      "value": "20000"
+    }]
+  }],
+  "suites": [{
+    "id": "7c30550c-b6e9-4c3b-8a22-123026000201",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": [
+      "7c30550c-b6e9-4c3b-8a22-123026000101",
+      "7c30550c-b6e9-4c3b-8a22-123026000102",
+      "7c30550c-b6e9-4c3b-8a22-123026000103",
+      "7c30550c-b6e9-4c3b-8a22-123026000104"
+    ]
+  }],
+  "urls": [
+    "https://papergames.io/"
+  ],
+  "plugins": []
+}

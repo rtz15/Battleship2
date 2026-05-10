@@ -120,11 +120,15 @@ Target web application:
 Ficha 5 suites:
 - `onboarding-robot-game`: Eduardo `110894`
 - `shared-link-game`: Vasco `111331`
-- `gameplay-rules`: Tiago `123026`
+- `session-controls-and-rankings`: Tiago `123026`
 
 A suite do Eduardo cobre quatro cenarios de onboarding do backlog: entrada no jogo, consulta de regras/armas, nickname e inicio de partida contra robot. Existem duas implementacoes:
 - testes Selenium WebDriver diretos em `ficha5.eduardo.selenium`
 - testes Selenide + Allure em `ficha5.eduardo`
+
+A suite do Tiago cobre quatro cenarios focados no estado inicial da partida e nas areas de sessao visiveis na landing page: rankings, torneios, estado inicial contra robot e abandono de partida. Existem duas implementacoes:
+- testes Selenium WebDriver diretos em `ficha5.tiago.selenium`
+- testes Selenide + Allure em `ficha5.tiago`
 
 ## Project artifacts
 
