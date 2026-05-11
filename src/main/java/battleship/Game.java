@@ -339,7 +339,7 @@ public class Game implements IGame
 	}
 
 	public Path exportSummary() throws IOException {
-		return exportSummary(PdfExporter.DEFAULT_OUTPUT_PATH);
+		return PdfExporter.export(createSummary());
 	}
 
 	public Path exportSummary(Path outputPath) throws IOException {
