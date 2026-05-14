@@ -3,6 +3,8 @@
 Battleship2 is a Java 21 command-line implementation of Battleship developed for the Software Engineering coursework. The current `main` branch already includes the Ficha 2 gameplay extensions, the Ficha 3 quality-analysis artifacts, and the Ficha 4 JUnit 6 testing phase.
 
 > Ficha 2 demo video: [Watch on YouTube](https://youtu.be/S00AQphHRkE)
+>
+> Ficha 5 acceptance tests demo video: [Watch on YouTube](https://youtu.be/srEkP3WnjWI)
 
 ## Team
 - `110894` Eduardo Sousa
