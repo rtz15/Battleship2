@@ -2,7 +2,6 @@ package ficha5.tiago.pages;
 
 import com.codeborne.selenide.SelenideElement;
 import ficha.tiago.selenium.pages.PaperGamesBattleshipSessionSeleniumPage;
-import ficha5.eduardo.pages.PaperGamesBattleshipPage;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -26,20 +25,22 @@ import static com.codeborne.selenide.Selenide.webdriver;
  * Page object for Tiago's Ficha 5 acceptance suite.
  */
 public class PaperGamesBattleshipSessionPage {
-	private final PaperGamesBattleshipPage onboardingPage = new PaperGamesBattleshipPage();
+	private static final String BATTLESHIP_URL = "https://papergames.io/en/battleship";
 
 	public PaperGamesBattleshipSessionPage openLandingPage() {
-		onboardingPage.openLandingPage();
+		com.codeborne.selenide.Selenide.open(BATTLESHIP_URL);
+		bodyShouldContainAny("Battleship Online", "Battleship trực tuyến");
+		prepareVisiblePage();
 		return this;
 	}
 
 	public PaperGamesBattleshipSessionPage startRobotGame() {
-		onboardingPage.startRobotGame();
+		seleniumPage().startRobotGame();
 		return this;
 	}
 
 	public PaperGamesBattleshipSessionPage chooseNickname(String nickname) {
-		onboardingPage.chooseNickname(nickname);
+		seleniumPage().chooseNickname(nickname);
 		return this;
 	}
 
@@ -87,9 +88,9 @@ public class PaperGamesBattleshipSessionPage {
 	}
 
 	public PaperGamesBattleshipSessionPage assertLandingPageRestoredAfterAbort() {
-		bodyShouldContainAny("Battleship Online");
-		elementContaining("Play vs robot").shouldBe(visible);
-		elementContaining("Play with a friend").shouldBe(visible);
+		bodyShouldContainAny("Battleship Online", "Battleship trực tuyến");
+		elementContaining("Play vs robot", "Chơi với robot").shouldBe(visible);
+		elementContaining("Play with a friend", "Chơi với một người bạn").shouldBe(visible);
 		return this;
 	}
 

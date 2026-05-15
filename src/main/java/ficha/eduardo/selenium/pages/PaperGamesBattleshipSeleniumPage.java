@@ -35,7 +35,7 @@ public class PaperGamesBattleshipSeleniumPage {
 
 	public PaperGamesBattleshipSeleniumPage openLandingPage() {
 		driver.get(BATTLESHIP_URL);
-		waitForAnyBodyText("Battleship Online", "Battleship trá»±c tuyáº¿n");
+		waitForAnyBodyText("Battleship Online", "Battleship trực tuyến");
 		waitForClientApp();
 		prepareVisiblePage();
 		return this;
@@ -48,7 +48,7 @@ public class PaperGamesBattleshipSeleniumPage {
 			if (nicknamePromptOpened(Duration.ofSeconds(2))) {
 				return this;
 			}
-			clickButtonAndWaitForNicknamePrompt("Play vs robot", "ChÆ¡i vá»›i robot");
+			clickButtonAndWaitForNicknamePrompt("Play vs robot", "Chơi với robot");
 			if (nicknamePromptOpened(Duration.ofSeconds(12))) {
 				return this;
 			}
@@ -167,7 +167,7 @@ public class PaperGamesBattleshipSeleniumPage {
 		fillNickname(input, nickname);
 		rejectConsentDialogIfVisible();
 
-		WebElement continueButton = wait.until(ExpectedConditions.elementToBeClickable(buttonContaining("Continue", "Tiáº¿p tá»¥c")));
+		WebElement continueButton = wait.until(ExpectedConditions.elementToBeClickable(buttonContaining("Continue", "Tiếp tục")));
 		clickElement(continueButton);
 	}
 
@@ -295,7 +295,7 @@ public class PaperGamesBattleshipSeleniumPage {
 	}
 
 	private void rejectConsentDialogIfVisible() {
-		List<WebElement> rejectButtons = driver.findElements(buttonContaining("Do not consent", "KhÃ´ng Ä‘á»“ng Ã½"));
+		List<WebElement> rejectButtons = driver.findElements(buttonContaining("Do not consent", "Không đồng ý"));
 		for (WebElement rejectButton : rejectButtons) {
 			if (rejectButton.isDisplayed() && rejectButton.isEnabled()) {
 				scrollIntoView(rejectButton);

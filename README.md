@@ -136,6 +136,21 @@ A suite do Tiago cobre quatro cenarios focados no estado inicial da partida e na
 - testes Selenium WebDriver diretos em `ficha5.tiago.selenium`
 - testes Selenide + Allure em `ficha5.tiago`
 
+Run the standard test suite without Ficha 5 acceptance tests:
+
+```bash
+mvn clean test
+```
+
+Run only the Ficha 5 acceptance suites:
+
+```bash
+mvn -Pacceptance-tests clean test
+```
+
+The current versioned Ficha 5 acceptance report is:
+- `reports/ficha5-acceptance-tests-allure-20260514-132642`
+
 ## Project artifacts
 
 - Code metrics: [CodeMetrics/README.md](CodeMetrics/README.md)
