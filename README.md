@@ -151,6 +151,45 @@ mvn -Pacceptance-tests clean test
 The current versioned Ficha 5 acceptance report is:
 - `reports/ficha5-acceptance-tests-allure-20260514-132642`
 
+## Ficha 6 distribution and operation
+
+The Ficha 6 deliverable packages the Battleship CLI as a Docker image and automates publication through GitHub Actions.
+
+### Local Docker image
+
+Build the shaded application jar:
+
+```bash
+mvn clean package
+```
+
+Build the local Docker image requested in the assignment:
+
+```bash
+docker build -t battleship-game:latest .
+```
+
+Run the container interactively:
+
+```bash
+docker run --rm -it battleship-game:latest
+```
+
+The repository includes:
+- `Dockerfile` based on `eclipse-temurin:21-jre`
+- `.dockerignore` tuned to ship only the shaded jar to the Docker build context
+- `.github/workflows/docker-publish.yml` to build and publish `${DOCKERHUB_USERNAME}/battleship-game`
+
+### Docker Hub publication workflow
+
+The Docker publication workflow runs on pushes to `main` and on manual dispatch. Before using it, configure the repository with:
+- repository variable `DOCKERHUB_USERNAME`
+- repository secret `DOCKERHUB_TOKEN`
+
+Once those credentials exist, the workflow publishes:
+- `${DOCKERHUB_USERNAME}/battleship-game:latest`
+- `${DOCKERHUB_USERNAME}/battleship-game:${GITHUB_SHA}`
+
 ## Project artifacts
 
 - Code metrics: [CodeMetrics/README.md](CodeMetrics/README.md)
