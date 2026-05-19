@@ -1,0 +1,13 @@
+services:
+  battleship:
+    image: battleship-game:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /app/runtime
+    stdin_open: true
+    tty: true
+    volumes:
+      - type: bind
+        source: ./data
+        target: /app/runtime
