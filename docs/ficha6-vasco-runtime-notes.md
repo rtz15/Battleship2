@@ -82,25 +82,69 @@ Static validation performed:
 - confirmed that `PdfExporter` writes to `output/summary.pdf`
 - confirmed that the professor WordPress/MySQL Compose file was not copied into the project solution
 
-Local runtime validation is still pending in this workspace because:
+Local runtime validation performed on 2026-05-19 after reboot:
 
-- WSL package `Microsoft.WSL` is installed, but WSL2 cannot start yet
-- Windows reports firmware virtualization as disabled
-- enabling Windows optional features requires an elevated administrator shell
-- the `docker` command is not available in PowerShell
+```powershell
+Get-CimInstance Win32_Processor | Select-Object VirtualizationFirmwareEnabled
+```
 
-Required validation after Docker Desktop is installed:
+Result: `VirtualizationFirmwareEnabled` still reported `False`.
 
 ```powershell
 wsl --version
 wsl --status
+```
+
+Result:
+
+- WSL version: `2.7.3.0`
+- kernel version: `6.6.114.1-1`
+- default WSL version: `2`
+- Windows version: `10.0.26200.8457`
+
+```powershell
 docker --version
 docker compose version
 docker info
 docker run hello-world
+```
+
+Result:
+
+- Docker client version: `29.4.3`
+- Docker Compose version: `v5.1.3`
+- Docker server version: `29.4.3`
+- Docker context: `desktop-linux`
+- Docker Desktop backend: `docker-desktop`
+- Docker kernel: `6.6.114.1-microsoft-standard-WSL2`
+- `docker run hello-world` completed successfully
+
+```powershell
 mvn clean package
+```
+
+Result: build success with `216` tests, `0` failures, `0` errors, and `0` skipped tests.
+
+```powershell
 docker compose build
-docker compose run --rm battleship
-docker compose run --rm battleship --lang=en
+```
+
+Result: build success for image `battleship-game:latest`.
+
+The application is interactive. In this automated validation shell, running without stdin displayed the Portuguese menu and then ended with `NoSuchElementException` at the prompt. To validate the runtime deterministically, the exit command was piped with TTY disabled:
+
+```powershell
+"desisto" | docker compose run --rm -T battleship
+"desisto" | docker compose run --rm -T battleship --lang=en
+```
+
+Result:
+
+- Portuguese runtime displayed the menu and exited with `Bons ventos!`
+- English runtime displayed the menu and exited with `Fair winds!`
+
+```powershell
 docker compose down
 ```
+
+Result: Compose network `battleship2_default` was removed successfully.
