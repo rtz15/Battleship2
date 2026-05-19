@@ -12,7 +12,7 @@ env:
 
 jobs:
   configuration-check:
-    if: ${{ env.DOCKERHUB_USERNAME == '' || env.DOCKERHUB_TOKEN == '' }}
+    if: ${{ vars.DOCKERHUB_USERNAME == '' || secrets.DOCKERHUB_TOKEN == '' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -20,7 +20,7 @@ jobs:
         run: echo "Skipping Docker publish. Configure DOCKERHUB_USERNAME and DOCKERHUB_TOKEN to enable this workflow."
 
   publish:
-    if: ${{ env.DOCKERHUB_USERNAME != '' && env.DOCKERHUB_TOKEN != '' }}
+    if: ${{ vars.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != '' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
