@@ -84,7 +84,9 @@ Static validation performed:
 
 Local runtime validation is still pending in this workspace because:
 
-- WSL is not installed
+- WSL package `Microsoft.WSL` is installed, but WSL2 cannot start yet
+- Windows reports firmware virtualization as disabled
+- enabling Windows optional features requires an elevated administrator shell
 - the `docker` command is not available in PowerShell
 
 Required validation after Docker Desktop is installed:
